@@ -13,7 +13,14 @@ include Basic Screen Effects by Emily Short.
 [to navigate this document, here are some codes I put in the text.
 (T)OGO = table of gameorder, to show all the rooms and the order they should be in
 (T)OGM = table of gamemoves, to show all the moves and what they should be
+(removing the parentheses of course so that those get removed)
 ]
+
+[For my own reference: 1=nothing 2=sword 4=right 8=left 16=down 32=up]
+
+[the below is used to figure how close this game is to Glulxitude. It is code from Zarf on intfiction.org.]
+
+Include (- Switches z; -) after "ICL Commands" in "Output.i6t".
 
 book undoing
 
@@ -125,6 +132,8 @@ a room can be doubled. a room is usually not doubled.
 
 Outside the Castle is a room. "You walk across the moat's drawbridge, which collapses. Hanging on to the remainder, you hack at some weird purple tentacles that come up from the moat, lift yourself up, and then you rush past a gate before it slams down, then a door before it shuts.[paragraph break]Great. Hack at enemies, enter gates and doors before they shut. How hard can it be?"
 
+hard-mode is a truth state that varies.
+
 debug-state is a truth state that varies.
 
 tthouscore is a number that varies. [this is the glulx workaround. basescore is your score, mod 10000.]
@@ -182,9 +191,13 @@ when play begins (this is the main start rule):
 	say "Your classmates jibed she was as un-smart as you. They even said the quest was beneath them, too silly if you looked at it right. Little more than a multiple choice test. Of course they could beat Singe the dragon, but it'd be a loss if anything in Singe's castle was unfair. You had to be street-smart. Dragons were like that. Plus there was no proof such a quest would advance society.";
 	wait for any key;
 	say "[line break]";
-	say "When you asked a retired adventurer, he mentioned it might be a bit trickier than the four-answer multiple choice tests that plagued you. There might be FIVE choices! 'But Dirk, I believe in you. Some of those questions may be loaded. You have the reflexes, the timing.'[paragraph break]'But if the questions are loaded, doesn't that mean they're extra hard?'[paragraph break]'Just use your common sense, Dirk, and don't overthink everything. Those eggheads, they'll consider how things that help [']em are physically impossible, and at least they'll feel smart when they die. They'd rather spend hours studying what they calculate is inside the castle than rely on their reflexes. That won't happen with you. Um, I mean, there--you'll keep focused on what's important. Like, you're good at being distracted by stuff that flashes. That'll help.'[paragraph break]Wow! Nobody ever put it that way before!";
+	say "When you asked a retired adventurer, he mentioned it might be a bit trickier than the four-answer multiple choice tests that plagued you. There might be FIVE choices! 'But Dirk, I believe in you. Some of those questions may be loaded. You have the reflexes, the timing.'[paragraph break]'But if the questions are loaded, doesn't that mean they're extra hard?'[paragraph break]'Just use your common sense, Dirk, and don't overthink everything. Those eggheads, they'll consider how things that help [']em are physically impossible, and at least they'll feel smart when they die. They'd rather spend hours studying what they calculate is inside the castle than rely on their reflexes. That won't happen with you. Um, I mean, there--you'll keep focused on what's important. Like, you're good at being distracted by stuff that flashes. And shiny things in general. That'll help.'[paragraph break]Wow! Nobody ever put it that way before!";
 	wait for any key;
-	say "[line break]";
+	say "[line break]'In fact, you're so good, just say the word and you'll get a bit of extra challenge.' (type yes for hard mode)";
+	if the player consents:
+		now hard-mode is true;
+	else:
+		now hard-mode is false;
 	say "You hear the sounds of two coins falling. You blink, and you're outside an eerie castle.";
 	now player is in Outside the Castle;
 	now left hand status line is "[location of the player]";
@@ -258,8 +271,16 @@ to say thedirs of (j - a number):
 	if j bit-and 32 is 32:
 		say " up";
 
+to decide whether (fi - a number) is last-in-room:
+	if fi is 2 and hard-mode is false: [Lizard King easy mode ends after first sword try, so we need to make an exception. Giddy goons, similarly.]
+		decide yes;
+	if fi is 1: [this is the default]
+		decide yes;
+	decide no;
+
 to dirkmove (a - a number):
 	now lastmove is a;
+	d "1.";
 	choose row row-in-moves in table of gamemoves;
 	if a is 1:
 		if wait-check entry bit-and 1 is 1:
@@ -267,6 +288,7 @@ to dirkmove (a - a number):
 			increment row-in-moves;
 			the rule succeeds;
 	let X be rightmove entry;
+	d "2.";
 	if is-mirrored is true:
 		if X is 4 or X is 8:
 			now X is X bit-xor 12;
@@ -286,19 +308,19 @@ to dirkmove (a - a number):
 				bumpscore points entry;
 		if points entry is -1:
 			say "BUG implement this!";
-		if there is a finished entry and finished entry is not 0:
-			if the finished entry is 1:
-				if location of player is dragon's lair:
-					say "The boys at the guild are surprised and jealous. They deconstruct your constant scrapes with death as nothing more than a simple multiple choice test, then mumble something about how you're lucky it's the middle ages and not the future, where you'd never make it as a Space Ace who can shoot laser guns, steer flying machines, and save the woman in distress.[paragraph break]You ask if women could shoot guns and steer machines in the future, too, after which you're shouted down as naive and impractical and contrary to the purposes of the adventurers['] guild.";
-					if ever-deth-msg is false:
-						say "[line break]";
-						ital-say "if you're curious about seeing all the death messages, you can type dethmsg and then replay through. Or you can just loot the source.";
-					end the story saying "GAME OVER";
-					the rule succeeds;
-				otherwise:
-					mark-solved;
-					pick-next-room;
-					prime-next-area;
+		d "Current row [row-in-moves].";
+		if there is a finished entry and finished entry is last-in-room:
+			if location of player is dragon's lair:
+				say "The boys at the guild are surprised and jealous. They deconstruct your constant scrapes with death as nothing more than a simple multiple choice test and even try negging Daphne a bit, the bums, then mumble something about how you're lucky it's the middle ages and not the future, where you'd never make it as a Space Ace who can shoot laser guns, steer flying machines, and save the woman in distress.[paragraph break]You ask if women could shoot guns and steer machines in the future, too, after which you're shouted down as naive and impractical and contrary to the purposes of the adventurers['] guild.";
+				if ever-deth-msg is false:
+					say "[line break]";
+					ital-say "if you're curious about seeing all the death messages, you can type dethmsg and then replay through. Or you can just loot the source.";
+				end the story saying "GAME OVER";
+				the rule succeeds;
+			otherwise:
+				mark-solved;
+				pick-next-room;
+				prime-next-area;
 		otherwise:
 			increment row-in-moves;
 			d "Current row row-in-moves.";
@@ -325,8 +347,6 @@ to dirkmove (a - a number):
 
 section last move shortcut determination
 
-[so far only implemented for the avalanche. The idea is to give alternate death routes.]
- 
 lastmove is a number that varies.
 
 to decide whether went-x:
@@ -340,12 +360,16 @@ to decide whether went-s:
 	decide no;
 
 to decide whether went-r:
-	if lastmove is 4:
+	if lastmove is 4 and is-mirrored is false:
+		decide yes;
+	if lastmove is 8 and is-mirrored is true:
 		decide yes;
 	decide no;
 
 to decide whether went-l:
-	if lastmove is 8:
+	if lastmove is 8 and is-mirrored is false:
+		decide yes;
+	if lastmove is 4 and is-mirrored is true:
 		decide yes;
 	decide no;
 
@@ -358,6 +382,18 @@ to decide whether went-u:
 	if lastmove is 32:
 		decide yes;
 	decide no;
+
+chapter amusing
+
+rule for amusing a victorious player:
+	say "Have you tried:[line break]";
+	repeat through table of amusements:
+		say "--[amuse entry][line break]";
+
+table of amusements
+amuse
+"UNDO twice?"
+"Restarting?"
 
 book commands
 
@@ -516,6 +552,7 @@ carry out zing:
 	say "Jumping to next area for debug purposes.";
 	mark-solved;
 	pick-next-room;
+	prime-next-area;
 	the rule succeeds;
 
 chapter hing
@@ -592,9 +629,11 @@ to prime-next-area:
 	repeat through the table of gamemoves:
 		increment temp;
 		if myroom entry is location of player:
-			now row-in-moves is temp;
-			now moved-in-room is false;
-			the rule succeeds;
+			if hard-mode is false or hard-only entry is false:
+				d "Starting [myroom entry] at row [temp].";
+				now row-in-moves is temp;
+				now moved-in-room is false;
+				the rule succeeds;
 	say "BUG NO ROOM FOUND";
 	
 to shuffle-room-table: [this arranges the rooms in pods of 3, except for the last]
@@ -663,7 +702,7 @@ a room called U and Pool Balls is a room. "A very long rainbow/ROY G BIV colored
 
 a room called Cage and Geyser is a room. "There's a cage all around you to the left and right.  Electricity flows from down. A door snaps open and closed, upward."
 
-Black Knight on Horse is a room. "As you observe the thorns to the right, a streak of lightning flashes and sticks your sword in its sheath! Then a knight charges you from above!"
+Black Knight on Horse is a room. "As you observe the thorns to the right, a streak of lightning flashes[if hard-mode is true] toward you from behind and to the left. Better move[else] and sticks your sword in its sheath! Then a knight charges you from above[end if]!"
 
 Twirling Boulders is a doubled room. "You're on a narrow walkway. Two spinning boulders on sticks, in a circle, periodically block your passage up. There's no way down."
 
@@ -734,19 +773,19 @@ Tentacle Room	false	8
 Snake Room	false	8
 Goop Room	false	8
 Slide and Pit	false	9
-Giddy Goons	false	22
-Fire and Lightning Room	false	35
+Giddy Goons	false	9
+Fire and Lightning Room	false	9
 Earthquake Room	true	10
-Earthquake Room	false	23
-Bats and Walkway	false	36
+Earthquake Room	false	10
+Bats and Walkway	false	10
 Electric Knight	true	11
-Electric Knight	false	24
-Bat King	false	37
+Electric Knight	false	11
+Bat King	false	11
 Electric Throne	false	12
-Vanishing Checkerboard	false	25
-Mud Monsters	false	38
+Vanishing Checkerboard	false	12
+Mud Monsters	false	12
 pd2	false	13
-pd2	true	26	[note: check this is not randomized and put first]
+pd2	true	13
 Dragon's Lair	false	39
 
 to say r-l:
@@ -779,7 +818,17 @@ to say whirl-d:
 to say obliv:
 	say "Oblivious of the swinging rope to the [r-l], you fall into the pit"
 
+to say disc-good-jump:
+	say "Not too bad a jump. Half the ledge collapses, but amazingly, your half remains perfectly horizontal. There's no time to worry about the physics, here, so you run away from it to a door"
+
+to say disc-jump-miss:
+	say "You had one guess, and it was a pretty obvious one--but you missed! Well, the jump bought you an extra half-second of self-reflection"
+
+to say dirk-d-king:
+	say "You're just too much for the exhausted Lizard King, Dirk. Even with your sword getting stuck in the wall a few times. Eventually you get in a good cut, and the Lizard king vanishes. You snicker as you take a few gold pieces from the now-dormant (and un-charged) pot"
+
 [wait-check works as follows. It is skipped if wait-check & 2 *and* you did not wait. If you wait and wait-check & 1, you'll be safe.]
+[finished works as follows: 1 = always, 2 = only in easy]
 
 table of gamemoves [togm]
 myroom	hard-only	finished	wait-check	rightmove	points	reverse	yay	boo	wait-txt
@@ -789,149 +838,163 @@ Flaming Pit	false	0	0	4	379	495	"You grab the next rope, not thinking about it. 
 Flaming Pit	false	0	0	4	495	495	"You grab the next rope yet again, not even worrying if you might mess this up. Oh, hey! There's a ledge to the [r-l]! You reach out your hand reflexively."	"[obliv]."
 Flaming Pit	false	1	0	4	915	915	"You jump off the rope and onto the ledge and through the door."	"At the last minute, you decide to jump [r-l], but you don't have enough momentum. Your feet wobble on the edge of the ledge you jump on. You fall into the pit. Boo, physics."
 Closing Wall	false	1	0	32	379	379	"You jump through the wall and land awkwardly but safely."	"You look for a way around the wall, then try to sneak through as it shuts. You make it halfway, which isn't good enough."
-Horsing Around Walls and Fire	false	--	0	4	495	495	"You avoid the fire to the [l-r] so well that you're now careening towards a fire on the [r-l]. Hooray, variety."	"You and your horse crash into the fire to the [r-l]. HOT HOT HOT!"
-Horsing Around Walls and Fire	false	--	0	8	495	495	"You avoid the fire to the [r-l]. Now there's fire on the [l-r]. And a pillar up ahead!"	"You and your horse crash into the fire to the [l-r]. HOT HOT HOT!"
-Horsing Around Walls and Fire	false	--	0	4	495	495	"You avoid the pillar and the fire. Now there's fire on the [r-l] with a pillar ahead."	"You and your horse crash into the fire to the [r-l] HOT HOT HOT!."
-Horsing Around Walls and Fire	false	--	0	8	495	495	"You avoid the fire to the [r-l]. Now there's a wall ahead and to the [r-l]."	"You and your horse crash into the fire to the [r-l] HOT HOT HOT!."
-Horsing Around Walls and Fire	false	--	0	8	1326	1326	"You avoid the wall! There's another wall ahead and to the [r-l], and no time to think about the lack of variety."	"[horse-fly]."
+Horsing Around Walls and Fire	false	0	0	4	495	495	"You avoid the fire to the [l-r] so well that you're now careening towards a fire on the [r-l]. Hooray, variety."	"You and your horse crash into the fire to the [r-l]. HOT HOT HOT!"
+Horsing Around Walls and Fire	false	0	0	8	495	495	"You avoid the fire to the [r-l]. Now there's fire on the [l-r]. And a pillar up ahead!"	"You and your horse crash into the fire to the [l-r]. HOT HOT HOT!"
+Horsing Around Walls and Fire	false	0	0	4	495	495	"You avoid the pillar and the fire. Now there's fire on the [r-l] with a pillar ahead."	"You and your horse crash into the fire to the [r-l] HOT HOT HOT!."
+Horsing Around Walls and Fire	false	0	0	8	495	495	"You avoid the fire to the [r-l]. Now there's a wall ahead and to the [r-l]."	"You and your horse crash into the fire to the [r-l] HOT HOT HOT!."
+Horsing Around Walls and Fire	false	0	0	8	1326	1326	"You avoid the wall! There's another wall ahead and to the [r-l], and no time to think about the lack of variety."	"[horse-fly]."
 Horsing Around Walls and Fire	false	1	0	8	495	495	"Your horse crashes into the ground. You brush yourself off, kicking open a door hard enough that it slams shut to deflect a random bolt of lightning. Take that, deportment classes you hated!"	"[horse-fly]."
 Drink Me	false	1	0	4	379	--	"That bottle looks like something from alchemy class, which you hated. Good thing you turned away--a beam zaps the door to the right just after it shuts behind you."	"[if lastmove bit-and 33 > 0]You manage to reverse-reverse-reverse-psychology yourself into drinking the potion. It turns you into a powder. Strangers['] magic is worse than strangers['] sweetmeats, Dirk![else]Scared of a little potion, you can't even pass by it to the exit. A lightning bolt zaps you.[end if]"
-Crypt Creeps	false	--	0	32	915	2191	"Oh no! A big skeletal hand appears from a doorway to the [l-r]!"	"The skull heads somehow manage to pull you down. You swing your sword, but it can't reach that close and low at the same time."
-Crypt Creeps	false	--	0	2	495	495	"You slash the hand. Now tar starts oozing out ahead...but the skeletons behind are yucky, too."	"There's no running. The hand grabs you."
-Crypt Creeps	false	--	0	32	915	2191	"Whew. Now another big skeletal hand, this time from the [r-l]!"	"You are stuck in the tar before you can make it forward."
-Crypt Creeps	false	--	0	2	495	495	"You slash the hand again. Now tar comes pouring from the [r-l] where it was."	"There's no running. The hand grabs you."
-Crypt Creeps	false	--	0	8	495	495	"You run to the [l-r] before the tar covers the hallway. You seem to be in a peaceful crypt--before robed skeletons pop out from everywhere!"	"The tar entraps you!"
+Crypt Creeps	false	0	0	32	915	2191	"Oh no! A big skeletal hand appears from a doorway to the [l-r]!"	"The skull heads somehow manage to pull you down. You swing your sword, but it can't reach that close and low at the same time."
+Crypt Creeps	false	0	0	2	495	495	"You slash the hand. Now tar starts oozing out ahead...but the skeletons behind are yucky, too."	"There's no running. The hand grabs you."
+Crypt Creeps	false	0	0	32	915	2191	"Whew. Now another big skeletal hand, this time from the [r-l]!"	"You are stuck in the tar before you can make it forward."
+Crypt Creeps	false	0	0	2	495	495	"You slash the hand again. Now tar comes pouring from the [r-l] where it was."	"There's no running. The hand grabs you."
+Crypt Creeps	false	0	0	8	495	495	"You run to the [l-r] before the tar covers the hallway. You seem to be in a peaceful crypt--before robed skeletons pop out from everywhere!"	"The tar entraps you!"
 Crypt Creeps	false	1	0	2	495	495	"You slash wildly, hacking several with one blow. Go, Dirk!"	"There is nowhere to run. They push you into a tomb of your own, cackling."
-Underground River	false	--	0	8	379	--	"You navigate to the left, remembering you row your oar on the right. Now there's a passage right in the next cavern! It flashes, which might kill you, but crashing into a wall certainly will."	"[splat-pur]."
-Underground River	false	--	0	4	379	--	"You navigate to the right, remembering you row your oar on the left. If there's a trick special case, you're in trouble, but the passage left in the next cavern doesn't look like one!"	"[splat-pur]."
-Underground River	false	--	0	8	379	--	"You navigate to the left. Now there's a passage right in the next cavern!"	"[splat-pur]."
-Underground River	false	--	0	4	379	--	"You navigate to the right. As the water changes from purple to orange, you float along, past a sign saying YE RAPIDS, where you see a passage to the right and up It's dang near a road, a lighter orange than the rest of the river!"	"[splat-pur]."
-Underground River	false	--	0	36	495	--	"Now that stripe is left and up."	"[or-scen]."
-Underground River	false	--	0	40	495	--	"Now that stripe is right and up."	"[or-scen]."
-Underground River	false	--	0	36	495	--	"Now it's left and up."	"[or-scen]."
-Underground River	false	--	0	40	495	--	"Just as you worry the next part of the rapids will be a stripe leading into a cavern wall, the water changes to green as -- ding ding -- you are by YE WHIRLPOOLS. There's one to the left."	"[or-scen]."
-Underground River	false	--	0	4	251	--	"Whirlpool to the right."	"[whirl-d]."
-Underground River	false	--	0	8	251	--	"You paddle towards the whirlpool, then away. That's a trick those eggheads in adventuring class would never try! You forget why it works, but doing not thinking matters now. Whirlpool to the left."	"[whirl-d]."
-Underground River	false	--	0	4	251	--	"Again with the contrary paddling. Whirlpool to the right."	"[whirl-d]."
-Underground River	false	--	0	8	251	--	"One more reverse-paddle, for Roman Hruska. The water picks up speed. You're thrown into the air. But there's a chain there, up and to the right. It flashes and dings."	"[whirl-d]."
+Underground River	false	0	0	8	379	--	"You navigate to the left, remembering you row your oar on the right. Now there's a passage right in the next cavern! It flashes, which might kill you, but crashing into a wall certainly will."	"[splat-pur]."
+Underground River	false	0	0	4	379	--	"You navigate to the right, remembering you row your oar on the left. If there's a trick special case, you're in trouble, but the passage left in the next cavern doesn't look like one!"	"[splat-pur]."
+Underground River	false	0	0	8	379	--	"You navigate to the left. Now there's a passage right in the next cavern!"	"[splat-pur]."
+Underground River	false	0	0	4	379	--	"You navigate to the right. As the water changes from purple to orange, you float along, past a sign saying YE RAPIDS, where you see a passage to the right and up It's dang near a road, a lighter orange than the rest of the river!"	"[splat-pur]."
+Underground River	false	0	0	36	495	--	"Now that stripe is left and up."	"[or-scen]."
+Underground River	false	0	0	40	495	--	"Now that stripe is right and up."	"[or-scen]."
+Underground River	false	0	0	36	495	--	"Now it's left and up."	"[or-scen]."
+Underground River	false	0	0	40	495	--	"Just as you worry the next part of the rapids will be a stripe leading into a cavern wall, the water changes to green as -- ding ding -- you are by YE WHIRLPOOLS. There's one to the left."	"[or-scen]."
+Underground River	false	0	0	4	251	--	"Whirlpool to the right."	"[whirl-d]."
+Underground River	false	0	0	8	251	--	"You paddle towards the whirlpool, then away. That's a trick those eggheads in adventuring class would never try! You forget why it works, but doing not thinking matters now. Whirlpool to the left."	"[whirl-d]."
+Underground River	false	0	0	4	251	--	"Again with the contrary paddling. Whirlpool to the right."	"[whirl-d]."
+Underground River	false	0	0	8	251	--	"One more reverse-paddle, for Roman Hruska. The water picks up speed. You're thrown into the air. But there's a chain there, up and to the right. It flashes and dings."	"[whirl-d]."
 Underground River	false	1	0	6	495	--	"Got it! Your momentum swings you over to a ledge, where not one but two gates close behind you as you make it to the next area."	"The chain flashed and dinged for you, but it wasn't able to snag you as you fell back into the water. Too bad, Dirk."
-Plummeting Disc	false	1	0	8	3255	3255	"Not too bad a jump. Half the ledge collapses, but amazingly, your half remains perfectly horizontal. You run away from it to a door, anyway."	"You try to jump but miss. AAAAAAAA!" 
-Avalanche	false	--	0	20	251	--	"You stumble out of the way of the rubble. For now. A door to the right flashes."	"You fall down the huge pit. AAAAAAA!"
+Plummeting Disc	false	1	1	8	3255	3255	"[disc-good-jump]."	"[disc-jump-miss]."	"No, not this stop. But there's one below."
+Plummeting Disc	false	1	1	8	3255	3255	"[disc-good-jump]."	"[disc-jump-miss]."	"No, not this stop, either. Maybe the ground below won't be too hard and cruel."
+Plummeting Disc	false	1	0	8	3255	3255	"[disc-good-jump]."	"[disc-jump-miss]."	"Your platform goes crashing through the ground. It cushions your fall enough to leave your corpse somewhat recognizable."
+Avalanche	false	0	0	20	251	--	"You stumble out of the way of the rubble. For now. A door to the right flashes."	"You fall down the huge pit. AAAAAAA!"
 Avalanche	false	1	0	4	251	--	"You exit through the flashing door just as a bunch of rocks tumble down where you were."	"[if lastmove bit-and 56 is 0]Unable or unwilling to run, you are trapped under a huge avalanche![else]You avoid the avalanche by falling to your doom. Okay, the avalanche actually catches up to you after a bit, but you're in no shape to notice.[end if]"
-U and Pool Balls	false	--	0	16	251	--	"What luck! The red ball rolls by, and as you sneak through, it rolls back to be crushed by the black ball. Just in case you needed proof the black ball was destructive and not just scary.[paragraph break]Now there's an orange ball down below."	"You get smooshed by the black ball. Or the red[u-nfair]."
-U and Pool Balls	false	--	0	16	379	--	"Now it's the orange ball's turn to crash into the black ball after missing you. You remember learning to cross a street watching for chariots, and how your parents told you it was no joke. They were right! Oh, look, a yellow ball down below."	"You get smooshed by the black ball. Or the orange[u-nfair]."
-U and Pool Balls	false	--	0	16	379	--	"The yellow ball is not too yellow to crash into the black ball after missing you. Beyond it is a green ball."	"You get smooshed by the black ball. Or the yellow[u-nfair]."
-U and Pool Balls	false	--	0	16	379	--	"The color variety is nice, especially because you forgot Roy G Biv, and it keeps you alert. If you had time to think, you'd be rather glad you weren't going to get killed by a dingy grey ball or a horrid pastel one. Since there's only a purple ball left below."	"You get smooshed by the black ball. Or the green[u-nfair]."
-U and Pool Balls	false	--	0	16	379	--	"The color variety is nice, especially because you forgot Roy G Biv, and it keeps you alert. If you had time to think, you'd be rather glad you weren't going to get killed by a dingy grey ball or a horrid pastel one. Since there's only a purple ball left below. Well, it could be indigo or violet. You went to adventuring school, not art school."	"You get smooshed by the black ball. Or the blue[u-nfair]."
-U and Pool Balls	false	--	0	16	379	--	"You feel a brief disorientation. There's a small gap up ahead, instead of a final indigo or violet ball, which is nice. And it's also up ahead, not down below, which just makes more sense. Man! It'd be embarrassing to miss this jump ahead, even with nobody watching."	"You get smooshed by the black ball. Or the purple. Being smooshed, you don't care about the details. Normally, 83% would be better than usual, Dirk, but here it's as good as 0%."
+U and Pool Balls	false	0	0	16	251	--	"What luck! The red ball rolls by, and as you sneak through, it rolls back to be crushed by the black ball. Just in case you needed proof the black ball was destructive and not just scary.[paragraph break]Now there's an orange ball down below."	"You get smooshed by the black ball. Or the red[u-nfair]."
+U and Pool Balls	false	0	0	16	379	--	"Now it's the orange ball's turn to crash into the black ball after missing you. You remember learning to cross a street watching for chariots, and how your parents told you it was no joke. They were right! Oh, look, a yellow ball down below."	"You get smooshed by the black ball. Or the orange[u-nfair]."
+U and Pool Balls	false	0	0	16	379	--	"The yellow ball is not too yellow to crash into the black ball after missing you. Beyond it is a green ball."	"You get smooshed by the black ball. Or the yellow[u-nfair]."
+U and Pool Balls	false	0	0	16	379	--	"The color variety is nice, especially because you forgot Roy G Biv, and it keeps you alert. If you had time to think, you'd be rather glad you weren't going to get killed by a dingy grey ball or a horrid pastel one. Since there's only a purple ball left below."	"You get smooshed by the black ball. Or the green[u-nfair]."
+U and Pool Balls	false	0	0	16	379	--	"The color variety is nice, especially because you forgot Roy G Biv, and it keeps you alert. If you had time to think, you'd be rather glad you weren't going to get killed by a dingy grey ball or a horrid pastel one. Since there's only a purple ball left below. Well, it could be indigo or violet. You went to adventuring school, not art school."	"You get smooshed by the black ball. Or the blue[u-nfair]."
+U and Pool Balls	false	0	0	16	379	--	"You feel a brief disorientation. There's a small gap up ahead, instead of a final indigo or violet ball, which is nice. And it's also up ahead, not down below, which just makes more sense. Man! It'd be embarrassing to miss this jump ahead, even with nobody watching."	"You get smooshed by the black ball. Or the purple. Being smooshed, you don't care about the details. Normally, 83% would be better than usual, Dirk, but here it's as good as 0%."
 U and Pool Balls	false	1	0	32	379	--	"You jump over the small gap and have a leisurely jog to the next room."	"With the black ball not chasing you, you figure there's no way you can mess up the easy jump over a small craaaaaaaa..."
-Cage	false	--	0	32	915	--	"Well, that wasn't too bad. You jump closer to the door."	"The electricity runs through you."
-Cage	false	--	0	32	1326	--	"You time the door perfectly! You jump just after it shuts. There's a narrow bridge across, with a huge flume of lava to the left. It sprays every few seconds."	"Hesitating, you time the jump through the door wrong as the electrical current approaches. SNAP!"
+Cage	false	0	0	32	915	--	"Well, that wasn't too bad. You jump closer to the door."	"The electricity runs through you."
+Cage	false	0	0	32	1326	--	"You time the door perfectly! You jump just after it shuts. There's a narrow bridge across, with a huge flume of lava to the left. It sprays every few seconds."	"Hesitating, you time the jump through the door wrong as the electrical current approaches. SNAP!"
 Cage	false	1	0	8	2191	--	"Your classmates made fun of you because you couldn't count, but man, you sure have timing down. The next flume misses you as you run left."	"Perhaps you felt guilty of your impeccable timing. Or perhaps you just have a fear of crumbly bridges. Or you wonder how the bridge survived the first flume. Whichever, it does not matter now where you are."
-Black Knight on Horse	false	--	0	8	1939	--	"You execute a nice somersault to the left. At least you didn't have to roll backwards! You never quite got the hang of that. The knight comes thundering back on his horse. You got turned around, so the thorns are on your right, now."	"Too bad, Dirk! The black knight rides off with your helmet on his sword. How it got there, you may not have figured, and you may not want to know."
-Black Knight on Horse	false	--	0	8	1939	--	"You got a weak grade in gymnastics, but you've got the practical part down. Another roll to the left, and you escape the knight again. Oh, look. There's a hole to the right! No thorns!"	"Too bad, Dirk! The black knight rides off with your helmet on his sword. How it got there, you may not have figured, and you may not want to know."
+Black Knight on Horse	true	--	0	36	1939	--	"You jump out of the way of the lightning, but it still sticks your sword in place."	"The lightning zaps you." [??guessing score as dragons-lair-project doesn't have it]
+Black Knight on Horse	false	0	0	8	1939	--	"You execute a nice somersault to the left. At least you didn't have to roll backwards! You never quite got the hang of that. The knight comes thundering back on his horse. You got turned around, so the thorns are on your right, now."	"Too bad, Dirk! The black knight rides off with your helmet on his sword. How it got there, you may not have figured, and you may not want to know."
+Black Knight on Horse	false	0	0	8	1939	--	"You got a weak grade in gymnastics, but you've got the practical part down. Another roll to the left, and you escape the knight again. Oh, look. There's a hole to the right! No thorns!"	"Too bad, Dirk! The black knight rides off with your helmet on his sword. How it got there, you may not have figured, and you may not want to know."
 Black Knight on Horse	false	1	0	4	2675	--	"You dive for the hole and make it as the sword lashes against you."	"Too bad, Dirk! The black knight rides off with your helmet on his sword. How it got there, you may not have figured, and you may not want to know."
-Twirling Boulders	false	--	0	32	4026	4750	"You ignore computing the relevant angular velocities, instead concentrating: I don't want the left boulder to hit me, or the right. You don't stop fearing both til they both pass at once. Your mad sprint succeeds![paragraph break]A ghostly apparition--well, it's more a sheet than anything--opens its folds and draws a glowing weapon. You hear thorns spring up behind you and to the sides."	"You panic, worrying too much about maybe stepping at the wrong time, then close your eyes and run blindly through. WHAM!!! You are thrown back into a wall."
-Twirling Boulders	false	--	0	2	2191	2191	"Shtwack! You've beaten lots scarier ghosts than that in practice. But thorns spring up to each side. You don't have time to think why the ghost was guarding that wall up ahead, either."	"As the ghost strikes you with a glowing rod, you worry any fellow slain adventurers will snark you couldn't even get that right."
-Twirling Boulders	false	--	0	16	1326	1326	"You escape the thorns! But now, since backward is forwards and forwards is backwards, (or they are what they were) the exit is up ahead!"	"You fail to move back away from the thorns."
+Twirling Boulders	false	0	0	32	4026	4750	"You ignore computing the relevant angular velocities, instead concentrating: I don't want the left boulder to hit me, or the right. You don't stop fearing both til they both pass at once. Your mad sprint succeeds![paragraph break]A ghostly apparition--well, it's more a sheet than anything--opens its folds and draws a glowing weapon. You hear thorns spring up behind you and to the sides."	"You panic, worrying too much about maybe stepping at the wrong time, then close your eyes and run blindly through. WHAM!!! You are thrown back into a wall."
+Twirling Boulders	false	0	0	2	2191	2191	"Shtwack! You've beaten lots scarier ghosts than that in practice. But thorns spring up to each side. You don't have time to think why the ghost was guarding that wall up ahead, either."	"As the ghost strikes you with a glowing rod, you worry any fellow slain adventurers will snark you couldn't even get that right."
+Twirling Boulders	false	0	0	16	1326	1326	"You escape the thorns! But now, since backward is forwards and forwards is backwards, (or they are what they were) the exit is up ahead!"	"You fail to move back away from the thorns."
 Twirling Boulders	false	1	0	32	915	915	"You made it, Dirk, and the exit didn't even have to flash at you! Way to go!"	"The thorns strangle you from behind. If they were particularly vicious or sentient, they'd feel lucky you seized up like that."
-Lizard King	false	--	0	40	1939	--	"You run forward some more after the magnetic pot. Uh-oh, Dirk! The Lizard king has you trapped from the right. He raises his scepter again."	"[konk]."
-Lizard King	false	--	0	4	1326	--	"And now he is coming at you from the left! Lucky you, the pot doesn't seem to want to double back behind the Lizard King."	"[konk]."
-Lizard King	false	--	0	4	1326	--	"And the left again! You know, it's sort of good the passages aren't branching here. The metal pot with your sword barely keeps in sight."	"[konk]."
-Lizard King	false	--	0	4	1326	--	"The Lizard King raises his scepter again to the left. Well, it'd be kind of worrying if he popped up from the right. He's not fast enough, really."	"[konk]."
-Lizard King	false	--	0	4	1326	--	"And again! Aren't those heavy robes going to take a toll soon?"	"[konk]."
-Lizard King	false	--	0	4	2191	--	"That's moot now. You finally hit a dead end--and there's your sword! The metallic pot of gold sits there, trapped."	"[konk]."
-Lizard King	false	1	0	34	3255	--	"You're just too much for the exhausted Lizard King, Dirk. Even with your sword getting stuck in the wall a few times. Eventually you get in a good cut, and the Lizard king vanishes. You snicker as you take a few gold pieces from the now-dormant (and un-charged) pot."	"You were so close, Dirk."
-Smithee	false	--	0	2	915	1326	"Well, the sword being perpendicular to your sword, that gave a greater range--ah, heck, you just swung and it clanged. Ooh! Here comes a mace!"	"The magic sword descends on you. At least you weren't beaten by someone weaker than you."
-Smithee	false	--	0	2	1939	2191	"The mace isn't appreciably different. Well, it's appreciably not different to deflect. But now a glowing anvil up ahead rises and swerves at you. There's fire to your [r-l]."	"The mace gets too close before you realize you should swing your sword, which shatters."
-Smithee	false	--	0	8	1326	1326	"Wow! You duck, but now a spear rises from a weapons rack and spins at you. Time it wrong, and you won't smack it just SO."	"You pause, then jump the wrong way into the fire. Or get clobbered into a wall by the flying anvil."
-Smithee	false	--	0	2	1326	1326	"Again, you hit the spear JUST perpendicular, and the angular momentum--nah, you just didn't want it to point straight at you. You treat your sword to a bit of magic fire, and a statue wakes up and growls, raising its axe."	"Wham! The spear smacks you just so. Well, it was a pretty tough practical physics problem, Dirk."
+Lizard King	false	0	0	40	1939	--	"You run forward some more after the magnetic pot. Uh-oh, Dirk! The Lizard king has you trapped from the right. He raises his scepter again."	"[konk]."
+Lizard King	false	0	0	4	1326	--	"And now he is coming at you from the left! Lucky you, the pot doesn't seem to want to double back behind the Lizard King."	"[konk]."
+Lizard King	false	0	0	4	1326	--	"And the left again! You know, it's sort of good the passages aren't branching here. The metal pot with your sword barely keeps in sight."	"[konk]."
+Lizard King	false	0	0	4	1326	--	"The Lizard King raises his scepter again to the left. Well, it'd be kind of worrying if he popped up from the right. He's not fast enough, really."	"[konk]."
+Lizard King	false	0	0	4	1326	--	"And again! Aren't those heavy robes going to take a toll soon?"	"[konk]."
+Lizard King	false	0	0	4	2191	--	"That's moot now. You finally hit a dead end--and there's your sword! The metallic pot of gold sits there, trapped."	"[konk]."
+Lizard King	false	2	0	34	3255	--	"[if hard-mode is true]You grab your sword! It's a bit more even, now.[else][dirk-d-king].[end if]"	"All that running, and you found it tough to change pace at the dead end, Dirk. The fight ahead [if hard-mode is true]would've been long, but you were in better shape[else]might've been very short indeed--in your favor."
+Lizard King	false	0	0	2	3255	--	"You stab your sword wildly into the wall, but it's easy to pull out. Man, the Lizard King is slow!"	"[sword-should]."
+Lizard King	false	0	0	2	3255	--	"Another stab, another dodge, but the Lizard King looks a bit tireder."	"[sword-should]."
+Lizard King	false	0	0	2	3255	--	"Another stab, another dodge, but the Lizard King looks even tireder."	"[sword-should]."
+Lizard King	false	0	0	18	3255	--	"The Lizard King ducks, but he's running on fumes."	"[sword-should]."
+Lizard King	false	0	0	2	3255	--	"The Lizard King looks totally beat after that last exchange."	"[sword-should]."
+Lizard King	false	1	0	2	3255	--	"[dirk-d-king]."	"[sword-should]."
+Smithee	false	0	0	2	915	1326	"Well, the sword being perpendicular to your sword, that gave a greater range--ah, heck, you just swung and it clanged. Ooh! Here comes a mace!"	"The magic sword descends on you. At least you weren't beaten by someone weaker than you."
+Smithee	false	0	0	2	1939	2191	"The mace isn't appreciably different. Well, it's appreciably not different to deflect. But now a glowing anvil up ahead rises and swerves at you. There's fire to your [r-l]."	"The mace gets too close before you realize you should swing your sword, which shatters."
+Smithee	false	0	0	8	1326	1326	"Wow! You duck, but now a spear rises from a weapons rack and spins at you. Time it wrong, and you won't smack it just SO."	"You pause, then jump the wrong way into the fire. Or get clobbered into a wall by the flying anvil."
+Smithee	false	0	0	2	1326	1326	"Again, you hit the spear JUST perpendicular, and the angular momentum--nah, you just didn't want it to point straight at you. You treat your sword to a bit of magic fire, and a statue wakes up and growls, raising its axe."	"Wham! The spear smacks you just so. Well, it was a pretty tough practical physics problem, Dirk."
 Smithee	false	1	0	2	915	915	"BZZZZZ! Your sword and the axe clash, and your sword wins. The statue returns to its frozen state."	"It was compassionate to let the statue win, but it can't move, so it isn't too happy with you. Not that you're in the mood to be happy after that blow. Or unhappy."
 Wind Tunnel	false	1	0	4	379	--	"Well, that jewel is certainly shiny, but that flashing door to the right gave off even more light! You tumble through it. And none too soon."	"You reach for the jewel, screaming as you fall into nothingness. You didn't even get the jewel. Well, there was no time to spend it."
-Tentacle Room	false	--	0	2	49	--	"A tentacle that bright green is hard to miss. So is that weapon rack flashing on the wall up a ways."	"Now wasn't the time for amateur botany, Dirk!"
-Tentacle Room	false	--	0	32	379	--	"You jump ahead just in time to escape some tentacles, and to see another squeezing down from above. Oh! Hey! There's that door out of here flashing to the right!"	"[tent-die]."
-Tentacle Room	false	--	0	4	495	--	"The door shuts. Thank goodness the stairs behind you are flashing now!"	"[tent-die]."
-Tentacle Room	false	--	0	20	915	--	"As you go right and climb the stairs, tentacles swarm down from there. Looks like you better retreat. Hey! That bench flashing to the left!"	"[tent-die]"
-Tentacle Room	false	--	0	8	1326	--	"Yours not to reason why, but that door ahead is open now--and flashing!"	"Well, you gave it your best shot, but there were too many tentacles coming from the stair. At least they don't insult you as they squeeze you to death."
+Tentacle Room	false	0	0	2	49	--	"A tentacle that bright green is hard to miss. So is that weapon rack flashing on the wall up a ways."	"Now wasn't the time for amateur botany, Dirk!"
+Tentacle Room	false	0	0	32	379	--	"You jump ahead just in time to escape some tentacles, and to see another squeezing down from above. Oh! Hey! There's that door out of here flashing to the right!"	"[tent-die]."
+Tentacle Room	false	0	0	4	495	--	"The door shuts. Thank goodness the stairs behind you are flashing now!"	"[tent-die]."
+Tentacle Room	false	0	0	20	915	--	"As you go right and climb the stairs, tentacles swarm down from there. Looks like you better retreat. Hey! That bench flashing to the left!"	"[tent-die]"
+Tentacle Room	false	0	0	8	1326	--	"Yours not to reason why, but that door ahead is open now--and flashing!"	"Well, you gave it your best shot, but there were too many tentacles coming from the stair. At least they don't insult you as they squeeze you to death."
 Tentacle Room	false	1	0	36	1939	--	"One of your fellow adventurers would've stopped you to force you to calculate the possibility something like this would happen Or he would've stopped to calculate, himself. He would be dead. You are not. Onward!"	"It couldn't have been as easy as going through the open door, could it? Surely there was another flashing furniture to jump on, or a tentacle to slaaaaaaaaaaaaaa..."
-Snake Room	false	--	0	2	495	--	"And another snake!"	"Bummer, Dirk! Slashing up enemies mindlessly is your specialty, and now wasn't the time to mix it up."
-Snake Room	false	--	0	2	2675	--	"The third snake comes down more quickly!"	"Bummer, Dirk! Slashing up enemies mindlessly is your specialty, and now wasn't the time to mix it up."
-Snake Room	false	--	0	3	49	--	"You've got a small breather. That skull on a rope up ahead flashes helpfully. It doesn't look as fun to cut down as those snakes."	"Bummer, Dirk! Slashing up enemies mindlessly is your specialty, and now wasn't the time to mix it up."
+Snake Room	false	0	0	2	495	--	"And another snake!"	"Bummer, Dirk! Slashing up enemies mindlessly is your specialty, and now wasn't the time to mix it up."
+Snake Room	false	0	0	2	2675	--	"The third snake comes down more quickly!"	"Bummer, Dirk! Slashing up enemies mindlessly is your specialty, and now wasn't the time to mix it up."
+Snake Room	false	0	0	3	49	--	"You've got a small breather. That skull on a rope up ahead flashes helpfully. It doesn't look as fun to cut down as those snakes."	"Bummer, Dirk! Slashing up enemies mindlessly is your specialty, and now wasn't the time to mix it up."
 Snake Room	false	1	0	36	1939	--	"You grab it, revealing a trap door up. Go, Dirk!"	"You missed your chance, Dirk. You wait around, wondering if you should've pulled the skull, then finally wondering if fellow adventurers in heaven will laugh at you for not being clever enough to at least try, as a snake wraps itself around you."
-Goop Room	false	--	0	32	2191	--	"You escape the first wave of goop only to look into a beaker--and out pops a goop monster! Good thing you grabbed it with your off-hand, Dirk."	"There are bloodier ways to die, but few less gross ways."
-Goop Room	false	--	0	2	3255	--	"Splat! Most of the goop behind you disappears as you hack the monster."	"Your compassion or dawdling gains you no brownie points."
-Goop Room	false	--	0	16	3255	--	"A huge goop-ghost flies out of the cauldron nearby!"	"You just walked right into the goop, there. Dirk. You don't even have time for childhood memories when that was fun."
-Goop Room	false	--	0	2	2191	--	"The ectoplasm from the monster you killed starts covering you from below, up and the left. Good thing a door's to the right."	"You didn't need to stamp out the defeated enemy any more, Dirk. In fact, that was counterproductive. The goop holds you in place before swallowing you."
+Goop Room	false	0	0	32	2191	--	"You escape the first wave of goop only to look into a beaker--and out pops a goop monster! Good thing you grabbed it with your off-hand, Dirk."	"There are bloodier ways to die, but few less gross ways."
+Goop Room	false	0	0	2	3255	--	"Splat! Most of the goop behind you disappears as you hack the monster."	"Your compassion or dawdling gains you no brownie points."
+Goop Room	false	0	0	16	3255	--	"A huge goop-ghost flies out of the cauldron nearby!"	"You just walked right into the goop, there. Dirk. You don't even have time for childhood memories when that was fun."
+Goop Room	false	0	0	2	2191	--	"The ectoplasm from the monster you killed starts covering you from below, up and the left. Good thing a door's to the right."	"You didn't need to stamp out the defeated enemy any more, Dirk. In fact, that was counterproductive. The goop holds you in place before swallowing you."
 Goop Room	false	1	0	4	1326	--	"That's enough of this room."	"You wait for the next wave of goop, and there's more than you thought. Ugh!"
-Slide	false	--	0	8	495	--	"You tumble to the left. A weird bug-eyed stalk blocks your passage right across the narrow walkway!"	"You fall down the shaft. Really, that was sort of unfair, how quick it happened, but what did you expect, from an evil intelligent dragon?"
-Slide	false	--	0	2	1939	--	"And now there's another one, bigger, stronger! This isn't combat practice any more, Dirk."	"The stalk grabs you as you try to walk across."
-Slide	false	--	0	9	915	--	"You walk up the stairs, and they widen. Ooh! There's a shiny chain to pull ahead! It's a little more mesmerizing than the sensible flashing exit left. But if you don't pull it, you'll never know what happens."	"This time you're not quite ready. The stalk is too big. It drags you down!"
+Slide	false	0	0	8	495	--	"You tumble to the left. A weird bug-eyed stalk blocks your passage right across the narrow walkway!"	"You fall down the shaft. Really, that was sort of unfair, how quick it happened, but what did you expect, from an evil intelligent dragon?"
+Slide	false	0	0	2	1939	--	"And now there's another one, bigger, stronger! This isn't combat practice any more, Dirk."	"The stalk grabs you as you try to walk across."
+Slide	false	0	0	9	915	--	"You walk up the stairs, and they widen. Ooh! There's a shiny chain to pull ahead! It's a little more mesmerizing than the sensible flashing exit left. But if you don't pull it, you'll never know what happens."	"This time you're not quite ready. The stalk is too big. It drags you down!"
 Slide	false	1	0	8	1326	--	"You crawl through the flashing exit. The chain probably wouldn't have swung you through the exit."	"As the chain pulls, water rushes at you. It sort of fills the hole, which might help the next adventurer, but not you. The stairs flatten out into a slide like the one you entered the room on. You would reflect on the symmetry of it all, but you're too busy screaming."
-Giddy Goons	false	--	0	2	379	--	"You've learned by now that slashing at the first enemy is always a good start. Well, you sort of knew it already. But at least you didn't forget. Several weird piggies come bouncing from the left, now! But not as fast as if you hadn't taken care of business."	"Ouch! The underdog's grit and hustle (accompanied by several other underdogs, and their grit, and their hustle) catches you off-guard. You should have been more direct, Dirk."
-Giddy Goons	false	--	0	4	1326	--	"You head right. Maybe they'll tire out. Being that heavy while bouncing, well...whew. And those stairs just up ahead--they won't just be tiring for you."	"You take a slice at one, but two others cover your face."
-Giddy Goons	false	--	0	34	3255	--	"The goons behind you hyperventilate a bit. They're far enough behind, you think you can deal with their bigger cousin that just popped out at the top. And you do, without thinking. You're at the top of the spiral staircase. You should probably hit that door to the left before anything pops up from it."	"You thought too much, Dirk, and that let the piggies catch up. Aigh!"
-Giddy Goons	false	1	0	41	--	--	"Good thinking, Dirk. Survive and advance. For whatever reason, the piggies don't follow you through the door. Maybe bouncing up and down that stairway was too exhausting."	"The piggies swarm you, not even thanking you for letting them avenge their cousin."
-Fire and Lightning Room	false	--	0	4	915	--	"More lightning strikes from the ceiling! It surrounds you on all sides except to the left. Well, you could probably get away with going up, too."	"Ouch, Dirk! You had one way to go, but it didn't work out."
-Fire and Lightning Room	false	--	0	40	1326	--	"The lightning fire continues to burn to the right and above."	"Ouch, Dirk! You had a couple ways to go, but it didn't work out. The paradox of choice!"
-Fire and Lightning Room	false	--	0	24	915	--	"Another ray blasts the door ahead, making it impossible to go forward! There's also the matter of the right and back walls being on fire, too. But the fire to the left died. Too bad an overturned bench is blocking a possible crawlspace to the left. You'd think it'd have burned up.[paragraph break]It looks too sturdy--and close to the wall--to hack up, and if it's glued there, you're in trouble. If not, hmm..."	"Ouch, Dirk! You had a couple ways to go, but it didn't work out. The paradox of choice!"
+Giddy Goons	false	0	0	2	379	--	"You've learned by now that slashing at the first enemy is always a good start. Well, you sort of knew it already. But at least you didn't forget. Several weird piggies come bouncing from the left, now! But not as fast as if you hadn't taken care of business."	"Ouch! The underdog's grit and hustle (accompanied by several other underdogs, and their grit, and their hustle) catches you off-guard. You should have been more direct, Dirk."
+Giddy Goons	false	0	0	4	1326	--	"You head right. Maybe they'll tire out. Being that heavy while bouncing, well...whew. And those stairs just up ahead--they won't just be tiring for you."	"You take a slice at one, but two others cover your face."
+Giddy Goons	false	2	0	34	3255	--	"The goons behind you hyperventilate a bit. They're far enough behind, you [if hard-mode is true]think you can deal with their bigger cousin that just popped out at the top. And you do, without thinking. You're at the top of the spiral staircase. You should probably hit that door to the left before anything pops up from it[else]make it through the door pretty easily[end if]."	"You thought too much, Dirk, and that let the piggies catch up. Aigh!"
+Giddy Goons	false	1	0	24	--	--	"Good thinking, Dirk. No need to pile up kills, or you might be next. Survive and advance."	"You wait too long before entering the door, and the piggies swarm you, not even thanking you for letting them avenge their cousin."
+Fire and Lightning Room	false	0	0	4	915	--	"More lightning strikes from the ceiling! It surrounds you on all sides except to the left. Well, you could probably get away with going up, too."	"Ouch, Dirk! You had one way to go, but it didn't work out."
+Fire and Lightning Room	false	0	0	40	1326	--	"The lightning fire continues to burn to the right and above."	"Ouch, Dirk! You had a couple ways to go, but it didn't work out. The paradox of choice!"
+Fire and Lightning Room	false	0	0	24	915	--	"Another ray blasts the door ahead, making it impossible to go forward! There's also the matter of the right and back walls being on fire, too. But the fire to the left died. Too bad an overturned bench is blocking a possible crawlspace to the left. You'd think it'd have burned up.[paragraph break]It looks too sturdy--and close to the wall--to hack up, and if it's glued there, you're in trouble. If not, hmm..."	"Ouch, Dirk! You had a couple ways to go, but it didn't work out. The paradox of choice!"
 Fire and Lightning Room	false	1	0	8	1326	--	"Well, what do you know. You're able to move the bench and crawl through the passage."	"Ouch, Dirk! You had one way to go, but it didn't work out."
-Earthquake Room	false	--	0	8	1326	1939	"That's natural. Run where the landslide ain't. What's not natural are the spikes coming out from the wall that blocked you to the [l-r]."	""
-Earthquake Room	false	--	0	32	1939	2191	"You tumble forward, and the ground crumbles behind and ahead of you. There's that wall on the [l-r], too."	"The spikes that impale you leave you unconscious before impact with the ground below. Yay?"
-Earthquake Room	false	--	0	4	2191	2675	"There's a pool ahead! The bottom hasn't fallen out yet. Maybe it has. But you do know how to swim."	"You stay next to the wall, which is more solid than the ground, but unfortunately it's less supportive."
-Earthquake Room	false	--	0	32	2675	3255	"Tentacles appear from the [r-l] and ahead after you dive."	"Perhaps an ancient fear of water prevented you from jumping in. As you fall, you look up. Why didn't the pool fall as well? Adventurers are often given to such philosophy late in life."
-Earthquake Room	false	--	0	8	3255	3551	"Your sword would never go fast enough. You emerge, saying hi to your friend the [l-r] wall, again. It's doing a good job keeping the ground ahead together. For now."	"The tentacles wrap you up and save you from falling to your death. Unfortunately, drowning isn't much better."
-Earthquake Room	false	--	0	32	3551	4026	"Ooh! You ran into a corner. And you can't go back. A spider descends to taunt you."	"You stay by your old friend the wall, the only thing that didn't collapse here. It stays with you as you fall all the way down."
-Earthquake Room	false	--	0	2	4026	4026	"It's good to have some sword action after all that running. But now, back to being chased by whatever earthquakes are after you. The way behind is blocked. But the door is [r-l]."	"Ouch! Tough to change gears, Dirk. The spider grabs your head and even keeps you from falling once the ground crumbles. But it grabbed so hard, you aren't conscious enough to appreciate it."
-Earthquake Room	false	--	0	4	5000	5000	"You're by the door out of here, just ahead! To your relief, the ground quits crumbling. But then you realize it's rising--and you'll get crushed by the ceiling."	"Maybe you feel bad about killing the spider, or whatever. You don't have much time to think about it, though."
+Earthquake Room	false	0	0	8	1326	1939	"That's natural. Run where the landslide ain't. What's not natural are the spikes coming out from the wall that blocked you to the [l-r]."	""
+Earthquake Room	false	0	0	32	1939	2191	"You tumble forward, and the ground crumbles behind and ahead of you. There's that wall on the [l-r], too."	"The spikes that impale you leave you unconscious before impact with the ground below. Yay?"
+Earthquake Room	false	0	0	4	2191	2675	"There's a pool ahead! The bottom hasn't fallen out yet. Maybe it has. But you do know how to swim."	"You stay next to the wall, which is more solid than the ground, but unfortunately it's less supportive."
+Earthquake Room	false	0	0	32	2675	3255	"Tentacles appear from the [r-l] and ahead after you dive."	"Perhaps an ancient fear of water prevented you from jumping in. As you fall, you look up. Why didn't the pool fall as well? Adventurers are often given to such philosophy late in life."
+Earthquake Room	false	0	0	8	3255	3551	"Your sword would never go fast enough. You emerge, saying hi to your friend the [l-r] wall, again. It's doing a good job keeping the ground ahead together. For now."	"The tentacles wrap you up and save you from falling to your death. Unfortunately, drowning isn't much better."
+Earthquake Room	false	0	0	32	3551	4026	"Ooh! You ran into a corner. And you can't go back. A spider descends to taunt you."	"You stay by your old friend the wall, the only thing that didn't collapse here. It stays with you as you fall all the way down."
+Earthquake Room	false	0	0	2	4026	4026	"It's good to have some sword action after all that running. But now, back to being chased by whatever earthquakes are after you. The way behind is blocked. But the door is [r-l]."	"Ouch! Tough to change gears, Dirk. The spider grabs your head and even keeps you from falling once the ground crumbles. But it grabbed so hard, you aren't conscious enough to appreciate it."
+Earthquake Room	false	0	0	4	5000	5000	"You're by the door out of here, just ahead! To your relief, the ground quits crumbling. But then you realize it's rising--and you'll get crushed by the ceiling."	"Maybe you feel bad about killing the spider, or whatever. You don't have much time to think about it, though."
 Earthquake Room	false	1	0	32	4750	4750	"Whew! That was pretty intimidating, with all the crumbling ground, but you managed to go where the holes ain't. You sort of wish there was someone to congratulate you, so you could be a bit humble!"	"Well, you didn't get crushed, but you did fall backwards into the void."
-Bats and Walkway	false	--	0	32	915	--	"The walkway behind crumbles. But there's still more to go. Good thing this isn't a maze--that'd get confusing."	"Well, there wasn't that much out there to grab a hold of, you think, seeing the narrow passage up then right. Did you really have a chance?"
-Bats and Walkway	false	--	0	40	915	--	"The walkway destruction stops just in time for bats to swoop you from the other way! How to ward them off?"	"The crumbling walkway catches up to you. It confuses the bats, sort of, but you're in no position to appreciate that."
-Bats and Walkway	false	--	0	2	2675	--	"Normal service is resumed. Well, except for the branching walkway flashing to the right. Oh no! Part of it disappeared as it flashed! Hey, no fair! Only doors are supposed to flash and disappear! I mean, you can probably jump over, but it's the principle of the thing."	"Oh, too bad! You missed a chance to lash out at the bats and take a break from running. It isn't their fault the walkway crumbled, but all the same, it'd have been nice."
-Bats and Walkway	false	--	0	4	915	--	"Oof! There's a bit of a gap to the right. With a ladder. But it's not like you can go back."	"It's the principle of the thing. It was your only way out, to the right, but ... AAAAAAA!"
+Bats and Walkway	false	0	0	32	915	--	"The walkway behind crumbles. But there's still more to go. Good thing this isn't a maze--that'd get confusing."	"Well, there wasn't that much out there to grab a hold of, you think, seeing the narrow passage up then right. Did you really have a chance?"
+Bats and Walkway	false	0	0	40	915	--	"The walkway destruction stops just in time for bats to swoop you from the other way! How to ward them off?"	"The crumbling walkway catches up to you. It confuses the bats, sort of, but you're in no position to appreciate that."
+Bats and Walkway	false	0	0	2	2675	--	"Normal service is resumed. Well, except for the branching walkway flashing to the right. Oh no! Part of it disappeared as it flashed! Hey, no fair! Only doors are supposed to flash and disappear! I mean, you can probably jump over, but it's the principle of the thing."	"Oh, too bad! You missed a chance to lash out at the bats and take a break from running. It isn't their fault the walkway crumbled, but all the same, it'd have been nice."
+Bats and Walkway	false	0	0	4	915	--	"Oof! There's a bit of a gap to the right. With a ladder. But it's not like you can go back."	"It's the principle of the thing. It was your only way out, to the right, but ... AAAAAAA!"
 Bats and Walkway	false	1	0	4	3551	--	"You're strong enough, you're quick enough, and darn it, nature likes you! You hoist yourself up the ladder and out the door."	"So close, Dirk. As you fall to your doom, you figure the ladder wouldn't have held you anyway. You're just too big and strong."
-Electric Knight	false	--	0	4	1939	2191	"Ooh! Look! The knight mashes his sword, and now there's an opening to the [l-r]."	"[woulda-quick]."
-Electric Knight	false	--	0	8	1939	2191	"And now it's ahead!"	"[woulda-quick]."
-Electric Knight	false	--	0	32	2191	2675	"Boy. You sure are lucky there's a way out, even though the pulses are coming faster, The [l-r] is not glowing."	"[woulda-quick]."
-Electric Knight	false	--	0	8	1939	2191	"The pulses come faster! Faster! Just like Reefer Madness. Wait, that doesn't exist yet. But a little space to the [r-l] does."	"[woulda-quick]."
-Electric Knight	false	--	0	4	1939	2191	"You'd think the knight would try and push you down, leaving a space open. But it's kind of smart he's not letting you go up. He's just making you jump back and forth. There's an opening to the [l-r]."	"[woulda-quick]."
-Electric Knight	false	--	0	8	1939	2191	"You jump forth and back. The knight doesn't see it, but you're cheating up with each movement, even as you jump faster. One more. The [l-r] is blocked."	"[woulda-quick]."
-Electric Knight	false	--	0	4	4026	4750	"Okay, he's out of charges. And boy is it convenient you're right by him! And that he's winding up for his sword-blow like a baseball batter!"	"[woulda-quick]."
+Electric Knight	false	0	0	4	1939	2191	"Ooh! Look! The knight mashes his sword, and now there's an opening to the [l-r]."	"[woulda-quick]."
+Electric Knight	false	0	0	8	1939	2191	"And now it's ahead!"	"[woulda-quick]."
+Electric Knight	false	0	0	32	2191	2675	"Boy. You sure are lucky there's a way out, even though the pulses are coming faster, The [l-r] is not glowing."	"[woulda-quick]."
+Electric Knight	false	0	0	8	1939	2191	"The pulses come faster! Faster! Just like Reefer Madness. Wait, that doesn't exist yet. But a little space to the [r-l] does."	"[woulda-quick]."
+Electric Knight	false	0	0	4	1939	2191	"You'd think the knight would try and push you down, leaving a space open. But it's kind of smart he's not letting you go up. He's just making you jump back and forth. There's an opening to the [l-r]."	"[woulda-quick]."
+Electric Knight	false	0	0	8	1939	2191	"You jump forth and back. The knight doesn't see it, but you're cheating up with each movement, even as you jump faster. One more. The [l-r] is blocked."	"[woulda-quick]."
+Electric Knight	false	0	0	4	4026	4750	"Okay, he's out of charges. And boy is it convenient you're right by him! And that he's winding up for his sword-blow like a baseball batter!"	"[woulda-quick]."
 Electric Knight	false	1	0	2	2191	2675	"Well, that's as close to a talking villain as you can get, since nobody's done any talking, yet. There's a gap to jump over ahead, but that's nothing compared to the board."	"It was too hard to change gears from jumping around to your sword-waving. Or maybe you hoped that if you waited, the knight would chop off his own head as he drew his sword back. It doesn't matter now."
-Bat King	false	--	0	2	1326	--	"Well, now the bats are chased, pretty much every walkway crumbled except to the left."	"The bats are not strong enough to pick you up and drop you on the other side of the gap. They're strong enough to stick to your face, though."
-Bat King	false	--	0	8	2191	--	"Oop! Some stairs are out ahead. The ones just beyond flash, not like you could go back in this narrow passage. You could just make it if you jump."	"Well, falling means you won't get mobbed by the bats. That's...something."
-Bat King	false	--	0	40	1326	--	"Oh, hey, how's this for variety? A giant bat that can't fly stumbles out of a doorway and raises his wings. You can't exactly go back."	"Aaaa! That's not the way to jump the gap ahead."
-Bat King	false	--	0	2	3551	--	"You can probably do anything at all. Your reflexes will kick in once the walkway behind crumbles."	"You'll never know what a hug from Princess Daphne feels like. Probably better than from the Bat King, you guess."
+Bat King	false	0	0	2	1326	--	"Well, now the bats are chased, pretty much every walkway crumbled except to the left."	"The bats are not strong enough to pick you up and drop you on the other side of the gap. They're strong enough to stick to your face, though."
+Bat King	false	0	0	8	2191	--	"Oop! Some stairs are out ahead. The ones just beyond flash, not like you could go back in this narrow passage. You could just make it if you jump."	"Well, falling means you won't get mobbed by the bats. That's...something."
+Bat King	false	0	0	40	1326	--	"Oh, hey, how's this for variety? A giant bat that can't fly stumbles out of a doorway and raises his wings. You can't exactly go back."	"Aaaa! That's not the way to jump the gap ahead."
+Bat King	false	0	0	2	3551	--	"You can probably do anything at all. Your reflexes will kick in once the walkway behind crumbles."	"You'll never know what a hug from Princess Daphne feels like. Probably better than from the Bat King, you guess."
 Bat King	false	1	0	63	49	--	"Left through the door you go. Or is it up? No time to worry about directions."	"You really shouldn't have died this way."
-Electric Throne	false	--	0	4	1326	--	"The circular rug continues to roll you up from the left. More of the circle is closing."	"Zzzzzzap! Megavolts, coming right up."
-Electric Throne	false	--	0	36	3255	--	"The circle's almost closed. The throne is to the right."	"Zzzzzzap! Megavolts, coming right up."
-Electric Throne	false	--	0	4	2675	--	"The throne spins you around as your scabbard snaps back in place. An electric charge comes along the wire. Yes! A door to the right!"	"Zzzzzzap! Megavolts, coming right up."
+Electric Throne	false	0	0	4	1326	--	"The circular rug continues to roll you up from the left. More of the circle is closing."	"Zzzzzzap! Megavolts, coming right up."
+Electric Throne	false	0	0	36	3255	--	"The circle's almost closed. The throne is to the right."	"Zzzzzzap! Megavolts, coming right up."
+Electric Throne	false	0	0	4	2675	--	"The throne spins you around as your scabbard snaps back in place. An electric charge comes along the wire. Yes! A door to the right!"	"Zzzzzzap! Megavolts, coming right up."
 Electric Throne	false	1	0	4	1939	--	"You stumble out before the electricity gets to you."	"You always wondered what it'd be like to have a nice long seat on a fancy throne. Too bad you can't be alive for it."
-Vanishing Checkerboard	false	--	0	16	1939	--	"Well, you're safe for now. That is, relatively. You're standing on two tiles, about to do a leg-split, farther away from the two exits up ahead than before."	"Your weight must've caused the nearby tiles to fall a bit quicker. You consider this hypothesis during the long tumble down."
-Vanishing Checkerboard	false	--	0	32	2675	--	"Oh! Look! Both ways are there! Your momentum is carrying you up, but the door left is flashing. You can't quite remember what was ahead, but it wasn't a door."	"Your next jump doesn't get you anywhere nearer the exits, or to a more populated area to jump. You fall to your doom."
+Vanishing Checkerboard	false	0	0	16	1939	--	"Well, you're safe for now. That is, relatively. You're standing on two tiles, about to do a leg-split, farther away from the two exits up ahead than before."	"Your weight must've caused the nearby tiles to fall a bit quicker. You consider this hypothesis during the long tumble down."
+Vanishing Checkerboard	false	0	0	32	2675	--	"Oh! Look! Both ways are there! Your momentum is carrying you up, but the door left is flashing. You can't quite remember what was ahead, but it wasn't a door."	"Your next jump doesn't get you anywhere nearer the exits, or to a more populated area to jump. You fall to your doom."
 Vanishing Checkerboard	false	1	0	8	1939	--	"Whew! Good thing the door had a stair ledge."	"Wrong choice, Dirk! Ahead leads to a cage. You scream and rattle the bars, but no luck."
-Mud Monsters	false	--	0	2	1326	--	"The mud monsters back up a bit, allowing passage ahead. You can't see them, but you hear their blurp bloop blurp behind and may even do so in the next room."	"[mudmon-yay]."
-Mud Monsters	false	--	0	33	1326	--	"Oo! A green geyser to jump over! It just finished firing! And it flashed, too! Double bonus!"	"[mudmon-yay]."
-Mud Monsters	false	--	0	32	2191	--	"You see a sneaky passage between two geysers ahead."	"[mudmon-yay]."
-Mud Monsters	false	--	0	36	2675	--	"Oh, hey, there's a path ahead to the next geyser!"	"[mudmon-yay]."
-Mud Monsters	false	--	0	32	1326	--	"The green geyser just ahead fires. The passage is kind of narrow, so you can't really walk around it."	"[mudmon-yay]."
-Mud Monsters	false	--	0	32	1326	--	"Wow! A wide red pool of mud, and you on a plank being followed by mud men. Thank goodness it's up high, so you can jump a bit farther."	"[mudmon-yay]."
-Mud Monsters	false	--	0	32	1326	--	"And one more green geyser ahead!"	"[mudmon-yay]."
-Mud Monsters	false	--	0	32	1326	--	"You hear a squilching sound behind--like when you cut previous enemies open with a sword. But the mud monsters don't die--they appear in small geysers to the side. You forget how not-fair this is when you see the exit across one final green river! If you were more of a naturalist, you might be disappointed you didn't get to jump a red geyser, too, but really, it's time to move on. It was...straightforward."	"[mudmon-yay]."
-Mud Monsters	false	1	0	36	1326	--	"You jump across the green river without and flume to blast you. Solid ground! A nice wide exit! That was both straightforward and exhausting. You needed all your adventurer training to get through, for sure."	"[mudmon-yay]."
-pd2	false	1	1	8	3255	3255	"There're actually three jumps, here. You decide to be all fancy and go for the lowest floor, like you get style points for it or something."	"You miss the jump, even though you've prepped for this before. As you tumble, you wonder what your peers would think."
-pd2	false	1	1	8	3255	3255	"There're actually three jumps, here. You decide to be all fancy and go for the lowest floor, like you get style points for it or something."	"You miss the jump, even though you've prepped for this before. As you tumble, you wonder what your peers would think."
-pd2	false	1	0	8	3255	3255	"There're actually three jumps, here. You decide to be all fancy and go for the lowest floor, like you get style points for it or something."	"You miss the jump, even though you've prepped for this before. As you tumble, you wonder what your peers would think."
-Dragon's Lair	false	--	0	8	1326	--	"You're not just brawn, Dirk! You're quickness, too! You catch the pile of trinkets before it falls, and the dragon doesn't wake up enough. Well, he does, enough to send out a gout of flame. Fortunately there's a gold pile to your left!"	"It's not your fault the trinkets fall to the ground, but the dragon doesn't seem to care. You are roasted!"
-Dragon's Lair	false	--	0	8	1939	--	"You duck behind the gold pile. The dragon falls asleep. You go up to Princess Daphne's bubble. She knows a lot more than the other adventurers say she did! Maybe they were scared of Singe's castle and just didn't want to admit it. She tells you about the key around the dragon's neck and the magic sword. And the dragon sleeps through it! Of course, it helps that you aren't one of those smart-alecks who would've laughed at the dragon for keeping something so lethal so near. And not even hiding it. That would've blown your cover.[wfak]But then you hear a rattling. More trinkets are jangling to the left!"	"Oh no, Dirk! The flame catches you. Your scream alerts the dragon he was right to be paranoid. But it's too late for him to thank you for making it easy."
-Dragon's Lair	false	--	0	8	-1326	--	"You catch the trinkets again! You wonder if the dragon is too lazy to pay anyone to clean his place up, neglecting that it's a neat extra security measure to have stuff that can fall over like this. But not for long. The dragon wakes up, sniffing around a bit more. He knows a few times is a coincidence. He sees you and chases you behind a pillar! One of his claws above grasps at it, and to the right..."	"This time, the dragon wakes up for good. He doesn't care that it was his flame that maybe upset his jewelry. You're an intruder. Well, you were."
-Dragon's Lair	false	--	0	24	2191	--	"You bolt away from the pillar! You're just quick enough to...hide behind another very similar pillar of a different color. Again the claws above and right."	"The dragon grabs you and squeezes you to death. This wasn't the ending embrace you'd hoped for."
-Dragon's Lair	false	--	0	24	2191	--	"Again you flee! There aren't many pillars to hide behind, and only so many gold piles. Wait! There it is! A reflective pillar to the right! You forgot your physics, Dirk, but it's all round and the dragon can probably bounce flame off it at any angle."	"No, there wasn't any trick to this. The dragon's got you. Sorry, Dirk."
-Dragon's Lair	false	--	0	4	3255	--	"One last time, you hide behind a pillar. And what do you see ahead but--the magic flaming sword! You don't need heavenly voices to tell you what it is, but you can't grab it til you approach it."	"The dragon is not just sly at hand-to-hand combat. He knows a few angles. Maybe he got some of his wealth at pool hu--oops, that's not important. What is, is, you're fried to a crisp."
-Dragon's Lair	false	--	0	36	2191	--	"You jump towards the sword! But it's too un-dramatic to grab it right away. Still, with Singe bearing down on you, best grab it. He breathes out..."	"The flame from the sword has nothing on Singe's flame, as you find out."
-Dragon's Lair	false	--	0	6	3551	--	"The magic sword repels the flame! You need to keep it up, though. Daphne applauds. Don't get distracted, Dirk!"	"There is no fleeing. Singe burns you up."
-Dragon's Lair	false	--	0	2	4026	--	"The magic sword does not break. Singe looks a little worried. But you're too close to him--right or down--to throw the sword, and stabbing him won't do enough damage."	"So close, Dirk. You die without feeling guilty that now Singe will hide the sword somewhere really tough, so the next adventurer won't luck out, and without worrying what the other adventurers will say and think of you as a result. It's best that way."
-Dragon's Lair	false	--	0	40	4750	--	"You step back, ready to throw the magic sword. Hopefully it is magic enough to stick in his neck tip first."	"You try for combat immediately, but--wrong choice."
+Mud Monsters	false	0	0	2	1326	--	"The mud monsters back up a bit, allowing passage ahead. You can't see them, but you hear their blurp bloop blurp behind and may even do so in the next room."	"[mudmon-yay]."
+Mud Monsters	false	0	0	33	1326	--	"Oo! A green geyser to jump over! It just finished firing! And it flashed, too! Double bonus!"	"[mudmon-yay]."
+Mud Monsters	false	0	0	32	2191	--	"You see a sneaky passage between two geysers ahead."	"[mudmon-yay]."
+Mud Monsters	false	0	0	36	2675	--	"Oh, hey, there's a path ahead to the next geyser!"	"[mudmon-yay]."
+Mud Monsters	false	0	0	32	1326	--	"The green geyser just ahead fires. The passage is kind of narrow, so you can't really walk around it."	"[mudmon-yay]."
+Mud Monsters	false	0	0	32	1326	--	"Wow! A wide red pool of mud, and you on a plank being followed by mud men. Thank goodness it's up high, so you can jump a bit farther."	"[mudmon-yay]."
+Mud Monsters	false	0	0	32	1326	--	"And one more green geyser ahead!"	"[mudmon-yay]."
+Mud Monsters	false	0	0	32	1326	--	"You hear a squilching sound behind--like when you cut previous enemies open with a sword. But the mud monsters don't die--they appear in small geysers to the side. You forget how not-fair this is when you see the exit across one final green river! If you were more of a naturalist, you might be disappointed you didn't get to jump a red geyser, too, but really, it's time to move on. It was...straightforward."	"[mudmon-yay]."
+Mud Monsters	false	2	0	36	1326	--	"You jump across the green river without an flume to blast you. [if hard-mode is true]One more flashing tunnel up ahead and ooh boy is it a big one![else]Solid ground! A nice wide exit! That was both straightforward and exhausting. You needed all your adventurer training to get through, for sure.[end if]"	"[mudmon-yay]."
+Mud Monsters	true	1	0	36	1326	--	"That's a wrap. As you run past, you find yourself wondering if a super big grate might fall behind you through the super big passage, neglecting how tough that would be to rig."	"As you wait, the mud monsters catch up to you. You'd have remembered the Tortoise and the Hare fable, if you'd stayed awake for that in school."
+pd2	false	1	1	8	124	124	"[disc-good-jump]. Probably no style points, but eh."	"You miss the jump, even though you've prepped for this before. As you tumble, you wonder what your peers would think."
+pd2	false	1	1	8	2191	2191	"[disc-good-jump]. You feel slightly daring for not taking the first jump."	"You miss the jump, even though you've prepped for this before. As you tumble, you wonder what your peers would think."
+pd2	false	1	0	8	3255	3255	"[disc-good-jump].You're sure you got maximum style points for hitting the lowest floor."	"You miss the jump, even though you've prepped for this before. As you tumble, you wonder what your peers would think."
+Dragon's Lair	false	0	0	8	1326	--	"You're not just brawn, Dirk! You're quickness, too! You catch the pile of trinkets before it falls, and the dragon doesn't wake up enough. Well, he does, enough to send out a gout of flame. Fortunately there's a gold pile to your left!"	"It's not your fault the trinkets fall to the ground, but the dragon doesn't seem to care. You are roasted!"
+Dragon's Lair	false	0	0	8	1939	--	"You duck behind the gold pile. The dragon falls asleep. You go up to Princess Daphne's bubble. She knows a lot more than the other adventurers say she did! Maybe they were scared of Singe's castle and just didn't want to admit it. She tells you about the key around the dragon's neck and the magic sword. And the dragon sleeps through it! Of course, it helps that you aren't one of those smart-alecks who would've laughed at the dragon for keeping something so lethal so near. And not even hiding it. That would've blown your cover.[wfak]But then you hear a rattling. More trinkets are jangling to the left!"	"Oh no, Dirk! The flame catches you. Your scream alerts the dragon he was right to be paranoid. But it's too late for him to thank you for making it easy."
+Dragon's Lair	false	0	0	8	-1326	--	"You catch the trinkets again! You wonder if the dragon is too lazy to pay anyone to clean his place up, neglecting that it's a neat extra security measure to have stuff that can fall over like this. But not for long. The dragon wakes up, sniffing around a bit more. He knows a few times is a coincidence. He sees you and chases you behind a pillar! One of his claws above grasps at it, and to the right..."	"This time, the dragon wakes up for good. He doesn't care that it was his flame that maybe upset his jewelry. You're an intruder. Well, you were."
+Dragon's Lair	false	0	0	24	2191	--	"[if hard-mode is true]You escape from behind the pillar! But you hear the dragon rumbling to breathe at you. If you jump forward, you might be able to hide behind that gold pile ahead. No time to go aroundit[else]You bolt away from the pillar! You're just quick enough to jump into a gold pile and hide behind another very similar pillar of a different color. Again the claws above and right[end if]."	"The dragon grabs you and squeezes you to death. This wasn't the ending embrace you'd hoped for."
+Dragon's Lair	true	0	0	32	2191	--	"The dragon's flame hits the gold pile! There's another pillar to the right to hide behind."	"The dragon's flame has a clear path. You are burnt up."
+Dragon's Lair	false	0	0	24	2191	--	"[if hard-mode is true]Yes! The pillar provides enough protection! You run away, and the dragon's coming at you from the side--but a gold pile would block him if you moved forward![else]Again you flee! There aren't many pillars to hide behind, and only so many gold piles. Wait! There it is! A reflective pillar to the right! You forgot your physics, Dirk, but it's all round and the dragon can probably bounce flame off it at any angle.[end if]"	"No, there wasn't any trick to this. The dragon's caught you this time. Sorry, Dirk."
+Dragon's Lair	true	0	0	32	2191	--	"And one more pillar to the right! You don't have time to feel lucky there are so many pillars or realize this far underground, there probably need to be. Just time to flee."	"You die, burnt by the dragon's flame, but--surrounded by gold."
+Dragon's Lair	false	0	0	4	3255	--	"One last time, you hide behind a pillar as the dragon's breath deflects off it. And what do you see ahead but--the magic flaming sword! You don't need heavenly voices to tell you what it is, but you can't grab it til you approach it."	"The dragon is not just sly at hand-to-hand combat. He knows a few angles. Maybe he got some of his wealth at pool hu--oops, that's not important. What is, is, you're fried to a crisp."
+Dragon's Lair	false	0	0	36	2191	--	"You jump towards the sword! But it's too un-dramatic to grab it right away. Still, with Singe bearing down on you, best grab it. He breathes out..."	"The flame from the sword has nothing on Singe's flame, as you find out."
+Dragon's Lair	false	0	0	6	3551	--	"The magic sword repels the flame! You need to keep it up, though. Daphne applauds. Don't get distracted, Dirk!"	"There is no fleeing. Singe burns you up."
+Dragon's Lair	false	0	0	2	4026	--	"The magic sword does not break. Singe looks a little worried. But you're too close to him--right or down--to throw the sword, and stabbing him won't do enough damage."	"So close, Dirk. You die without feeling guilty that now Singe will hide the sword somewhere really tough, so the next adventurer won't luck out, and without worrying what the other adventurers will say and think of you as a result. It's best that way."
+Dragon's Lair	false	0	0	40	4750	--	"[if hard-mode is true]You step back, blocking the dragon's flame-blast until it expires. You're ready to throw the magic sword. Hopefully it is magic enough to stick in his neck tip first[else]You step back. The dragon rears its head for a huge flame-blast[end if]."	"[if lastmove bit-and 2 is 2]You try for combat immediately, but--wrong choice[else]There is nowhere to run[end if]. The dragon's flame burns you up."
+Dragon's Lair	true	0	0	2	4750	--	"The sword deflects the dragon's flame-blast! Quick, Dirk, while it's recharging!"	"Your fear makes you delay. You are stuck. And burnt up. So close, Dirk!"
 Dragon's Lair	false	1	0	2	5000	--	"You throw the sword. Right in the neck! Singe collapses. You take the key from his neck and unlock Daphne. Mushiness ensues. Way to go, Dirk![paragraph break]Now how do you get out of here?[wfak]While you're thinking, the castle itself begins to crumble. Your adventures caused so much structural damage, the Dragon crashing to its death started off an earthquake. With debris dropping everywhere, you and Daphne can only run towards each flashing door you see. But you're all over that by now, man![wfak]"	"Oh no, Dirk! You fall at the final hurdle[if drag-kill > 1 and lives-left > 1]. Or maybe you know exactly what you're doing--as greedy for maximum points as Singe was for treasure. Daphne sobs as she looks on, uncomprehending. Are those extra points really worth it?[else if lives-left > 1]. Or maybe you're trying for a few last points, like this guy: https://stevenf.com/2014/05/21/arcade-story/?[else if lives-left is 0], and you don't have any chances left. Pathos![end if][in-drag]"
+[togm-end]
 
 to say in-drag:
 	increment drag-kill;
@@ -947,6 +1010,9 @@ to say tent-die:
 	
 to say konk:
 	say "KONK! You pass out with a goofy smile on your face. That's...something. The lizard king drags you away"
+
+to say sword-should:
+	say "Unaccountably, you freeze when just lashing out with your sword would've done. [konk]"
 
 chapter dircheating
 
@@ -984,6 +1050,9 @@ volume beta testing - not for release
 
 when play begins:
 	say "Generic warning to set beta testing volume to not for release.";
+	say "Order of rooms:";
+	repeat through table of gameorder:
+		say "[myroom entry][if mirrored entry is true] (flipped)[end if][line break]";
 
 volume testing - not for release
 
@@ -1039,7 +1108,7 @@ chapter tests
 
 [* room tests from 1 to 39]
 
-test r1 with "l/l/l/l";
+[test r1 with "l/l/l/l";
 test r2 with "r/r/r/r";
 test r3 with "u";
 test r4 with "l/r/l/r/r/r";
@@ -1085,4 +1154,4 @@ test rnext with "test r14/test r15/test r16/test r17/test r18/test r19/test r20/
 
 test rlast with "test r27/test r28/test r29/test r30/test r31/test r32/test r33/test r34/test r35/test r36/test r37/test r38/test r39"
 
-test ofudge with "s/test r28/test r29/test r30/test r31/test r32/test r33/test r34/test r35/test r36/test r37/test r38"
+test ofudge with "s/test r28/test r29/test r30/test r31/test r32/test r33/test r34/test r35/test r36/test r37/test r38"]
