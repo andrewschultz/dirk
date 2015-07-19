@@ -2,7 +2,7 @@
 
 the story headline is "A twice-as-expensive, yet still free, text adventure"
 
-use no scoring. [Ironic, isn't it? Thing is, to keep this game un-glulx, I needed a workaround for breaking 32767 points. So this was easier to code than turning the score off, etc.]
+use no scoring. [Ironic, isn't it? Thing is, to keep this game un-glulx, I needed a workaround for breaking 32767 points. I mean, what's the point of a retro game if it has to fit into the latest format?]
 
 include Bitwise Operators by Bart Massey.
 
@@ -33,7 +33,7 @@ to say email:
 	say "blurglecruncheon@gmail.com";
 
 to say cmds:
-	say "U/L/D/R to move Dirk, S for sword/attack, or Z to wait, which is usually a bad idea. H gives a command list, and an empty command refreshes your current situation"
+	say "U/L/D/R to move Dirk, S for sword/attack, or Z to wait, which is usually a bad idea but sometimes gets you extra points. H gives a command list, and an empty command refreshes your current situation"
 
 does the player mean examining the player: it is very likely.
 
@@ -597,25 +597,23 @@ to prime-next-area:
 			the rule succeeds;
 	say "BUG NO ROOM FOUND";
 	
-to shuffle-room-table: [this arranges the rooms in pods of 3]
-	now rooms-in-seq is number of rows in table of gameorder / 3;
+to shuffle-room-table: [this arranges the rooms in pods of 3, except for the last]
+	now rooms-in-seq is number of rows in table of gameorder / 3; [13, but just being exact]
 	let A be a list of numbers;
-	repeat with Q running from 1 to rooms-in-seq:
-		add Q to A;
-		add (Q + rooms-in-seq) to A;
-		add (Q + (2 * rooms-in-seq)) to A;
-		sort A in random order;
-		repeat with Z running from 1 to 3:
-			choose row (Q * 3) + Z - 3 in table of gameorder;
-			now gameord entry is entry Z in A;
-		remove A from A;
-	choose row with myroom of Dragon's Lair in the table of gameorder;
-	if gameord entry is not 39:
-		let Z be gameord entry;
-		choose row with gameord of 39 in table of gameorder;
-		now gameord entry is Z;
-		choose row with myroom of Dragon's Lair in the table of gameorder;
-		now gameord entry is 39;
+	let cur-room be 0;
+	let extra be 0;
+	repeat with Q running from 0 to rooms-in-seq - 1:
+		now cur-room is 3 * Q;
+		now extra is 0; [below is a crude fisher yates sort on 3 elements. It's adapted to the specifics, where x, x+13 and x+26 are the entries.]
+		if Q < rooms-in-seq - 1: [don't sort the dragon's lair in all this, because it has to come last.]
+			increase extra by a random number between 1 and 3;
+			choose row cur-room + extra in the table of gameorder;
+			increase the gameord entry by 26;
+		increase extra by a random number between 1 and 2;
+		if extra > 3:
+			decrease extra by 3;
+		choose row cur-room + extra in the table of gameorder;
+		increase the gameord entry by 13;
 	sort table of gameorder in gameord order;
 	
 to print-out-litany: [this is for debug purposes]
@@ -712,29 +710,29 @@ Dragon's Lair is a room. "This is it, Dirk! You're at your goal! [if drag-kill >
 table of gameorder [togo]
 myroom	mirrored	gameord	sol	vis
 Flaming Pit	true	1	false	false
-Flaming Pit	false	14
-Closing Wall	false	27
+Flaming Pit	false	1
+Closing Wall	false	1
 Horsing Around Walls and Fire	true	2
-Horsing Around Walls and Fire	false	15
-Drink Me	false	28
+Horsing Around Walls and Fire	false	2
+Drink Me	false	2
 Crypt Creeps	true	3
-Crypt Creeps	false	16
-Underground River	false	29
+Crypt Creeps	false	3
+Underground River	false	3
 Plummeting Disc	false	4
-Plummeting Disc	true	17
-Avalanche	false	30
+Plummeting Disc	true	4
+Avalanche	false	4
 U and Pool Balls	false	5
-Cage and Geyser	false	18
-Black Knight on Horse	false	31
+Cage and Geyser	false	5
+Black Knight on Horse	false	5
 Twirling Boulders	true	6
-Twirling Boulders	false	19
-Lizard King	false	32
+Twirling Boulders	false	6
+Lizard King	false	6
 Smithee	true	7
-Smithee	false	20
-Wind Tunnel	false	33
+Smithee	false	7
+Wind Tunnel	false	7
 Tentacle Room	false	8
-Snake Room	false	21
-Goop Room	false	34
+Snake Room	false	8
+Goop Room	false	8
 Slide and Pit	false	9
 Giddy Goons	false	22
 Fire and Lightning Room	false	35
