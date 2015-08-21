@@ -629,7 +629,7 @@ to prime-next-area:
 	repeat through the table of gamemoves:
 		increment temp;
 		if myroom entry is location of player:
-			if hard-mode is false or hard-only entry is false:
+			if hard-mode is true or hard-only entry is false:
 				d "Starting [myroom entry] at row [temp].";
 				now row-in-moves is temp;
 				now moved-in-room is false;
@@ -692,13 +692,13 @@ Drink Me is a room. "A small room. You walk towards an icky potion ahead of you 
 
 Crypt Creeps is a doubled room. "Just another hallway going forward. Exits are up ahead to the side, but...first, those bouncing skeleton heads that popped out. They're too many, and too low, to fight."
 
-Underground River is a room. "You walk obliviously to the edge of a narrow cliff and are suprised when it collapses ten feet from the edge. You fall into a purple river, and even more surprisingly, right into a barrel swept along by a current of purple water. Before you can properly appreciate the luck involved, you float past a sign saying YE BOULDERS and suddenly see there's a small flashing cave to the left--better go there, or you'll hit that rock wall ahead. Or to the sides."
+Underground River is a room. "You walk obliviously to the edge of a narrow cliff and are suprised when it collapses ten feet from the edge. You fall into a purple river, and even more surprisingly, right into a barrel swept along by a current of purple water.[paragraph break]Before you can properly appreciate the luck involved, you float past a sign saying YE BOULDERS and suddenly see there's a small flashing cave to the LEFT--better go there, or you'll hit that rock wall ahead. Or to the sides."
 
 Plummeting Disc is a doubled room. "You jump through a doorway to a glowing wooden circle suspended in midair. It flashes and starts falling. You scream, but at least you keep your eyes open to see the ledge to the [l-r]!"
 
 Avalanche is a room. "You hear a rumbling above. The ground up and to the left begins falling into a void."
 
-a room called U and Pool Balls is a room. "A very long rainbow/ROY G BIV colored U lies below. Very large pool balls roll back and forth with perfect conservation of energy, so you can't wait forever them to die out. Oh, and a huge black bowling ball just upwards means you REALLY can't wait. First up is a red ball. Oh man! This place is all topsy turvy, and you even have to wait just right to pass the red ball below."
+a room called U and Pool Balls is a room. "A very long rainbow/ROY G BIV colored U lies below. Very large pool balls roll back and forth with perfect conservation of energy, so you can't wait forever them to die out. Oh, and a huge black bowling ball just upwards means you REALLY can't wait.[paragraph break]First up is a red ball. Oh man! This place is all topsy turvy, and you even have to wait just right to pass the red ball below."
 
 a room called Cage and Geyser is a room. "There's a cage all around you to the left and right.  A door rhythmically snaps open and closed just ahead, but you should probably be more worried about the electricity flowing behind to start."
 
@@ -869,10 +869,10 @@ Crypt Creeps	false	0	0	32	915	2191	"Whew. Now another big skeletal hand, this ti
 Crypt Creeps	false	0	0	2	495	495	"You slash the second hand. Now tar comes pouring from the [r-l] where it was."	"There's no running. The hand grabs you."
 Crypt Creeps	false	0	0	8	495	495	"You run to the [l-r] before the tar covers the hallway. You seem to be in a peaceful crypt--before robed skeletons pop out from everywhere! They're all cackling, so nobody's looking for revenge. But they're also in a circle--a circle you can't break, but you could sweep just so."	"The tar entraps you!"
 Crypt Creeps	false	1	0	2	495	495	"You slash wildly, hacking several with one blow. Go, Dirk!"	"There is nowhere to run. They push you into a tomb of your own before you can even figure if one is missing a hand from the hallway."
-Underground River	false	0	0	8	379	--	"You navigate to the left, remembering you row your oar on the right. PHYSICS! Now there's a flash right in the next cavern! You haven't seen too many flashing rocks. Glowing, yes, but not flashing."	"[splat-pur]."
+Underground River	false	0	0	8	379	--	"You navigate to the left, remembering you row your oar on the right. PHYSICS! Now there's a flash to the right! You haven't seen too many flashing rocks. Glowing, yes, but not flashing. So that should be an opening."	"[splat-pur]."
 Underground River	false	0	0	4	379	--	"You navigate to the right, remembering you row your oar on the left. If there's a trick special case, you're in trouble, but the passage left in the next cavern doesn't look like one!"	"[splat-pur]."
 Underground River	false	0	0	8	379	--	"You navigate to the left. Take that, people who said you don't know your left from your right! Now there's a passage right in the next cavern!"	"[splat-pur]."
-Underground River	false	0	0	4	379	--	"Blam! Four for four! As the water changes from purple to orange, you float along, past a sign saying YE RAPIDS, where you see a passage to the right and up It's dang near a road, a lighter orange than the rest of the river!"	"[splat-pur]."
+Underground River	false	0	0	4	379	--	"Blam! Four for four! As the water changes from purple to orange, you float along, past a sign saying YE RAPIDS, where you see a passage to the right and up. It's dang near a road, a lighter orange than the rest of the river!"	"[splat-pur]."
 Underground River	false	0	0	36	495	--	"Yup, you'll be okay as long as you remember to row from the opposite side. Now that stripe is left and up."	"[or-scen]."
 Underground River	false	0	0	40	495	--	"Bang on again, Dirk. You're almost too cool for school. Now that stripe is right and up."	"[or-scen]."
 Underground River	false	0	0	36	495	--	"Now it's left and up. It's like military camp with the left right left right!"	"[or-scen]."
@@ -1057,7 +1057,7 @@ understand "li" as liing.
 carry out liing:
 	now inf-lives is whether or not inf-lives is false;
 	if inf-lives is true:
-		say "[one of]You have a vision of two kids in a castle with weird lights and noises. They tie a coin around a string and sticking them into some sort of booth and giggling. Man! You always wanted to learn to yo-yo.  You're gonna do that once you crack this castle. (You now have infinite lives.)[or]The vision of the giggling kids returns. [stopping][paragraph break]";
+		say "[one of]You have a vision of two kids in a castle with weird lights and noises. They tie a coin around a string and sticking them into some sort of booth and giggling. Man! You always wanted to learn to yo-yo.  You're gonna do that once you crack this castle. (You now have infinite lives.) [or]The vision of the giggling kids returns. [stopping][paragraph break]";
 	else:
 		say "You have a visions of a no fun looking adult [one of][or]once again [stopping]apprehending the two kids with the coin on the string and frog marching them away from the booth. The kids are kicked out![paragraph break]At least they weren't thrown in the castle dungeon off to the side. That's what the place with the scary singing animals must be.";
 	the rule succeeds;
