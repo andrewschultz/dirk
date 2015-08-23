@@ -72,6 +72,12 @@ after reading a command:
 	if word number 1 in the player's command is "dethmsg":
 		change the text of the player's command to QQ;
 		continue the action;
+	if word number 1 in the player's command is "c":
+		change the text of the player's command to QQ;
+		continue the action;
+	if word number 1 in the player's command is "ch":
+		change the text of the player's command to QQ;
+		continue the action;
 	if word number 1 in the player's command is "xyzzy":
 		change the text of the player's command to QQ;
 		continue the action;
@@ -288,7 +294,8 @@ to dirkmove (a - a number):
 			increment row-in-moves;
 			the rule succeeds;
 	let X be right-easy entry;
-	if hard-mode istr
+	if hard-mode is true and there is a right-hard entry:
+		now X is right-hard entry;
 	d "2.";
 	if is-mirrored is true:
 		if X is 4 or X is 8:
@@ -315,7 +322,7 @@ to dirkmove (a - a number):
 				say "The boys at the guild are surprised and jealous. They deconstruct your constant scrapes with death as nothing more than a simple multiple choice test and even try negging Daphne a bit, the bums, then mumble something about how you're lucky it's the middle ages and not the future, where you'd never make it as a Space Ace who can shoot laser guns, steer flying machines, and save the woman in distress.[paragraph break]You ask if women could shoot guns and steer machines in the future, too, after which you're shouted down as naive and impractical and contrary to the purposes of the adventurers['] guild.";
 				if ever-deth-msg is false:
 					say "[line break]";
-					ital-say "if you're curious about seeing all the death messages, you can type dethmsg and then replay through. Or you can just loot the source.";
+					ital-say "if you're curious about seeing all the death messages, you can type dethmsg and then replay through. Or you can just pore through the source.";
 				end the story saying "GAME OVER";
 				the rule succeeds;
 			otherwise:
@@ -325,8 +332,16 @@ to dirkmove (a - a number):
 		otherwise:
 			increment row-in-moves;
 			d "Current row row-in-moves.";
+			let need-to-skip be true;
 			choose row row-in-moves in table of gamemoves;
-			while wait-check entry bit-and 2 is 2:
+			while need-to-skip is true:
+				now need-to-skip is false;
+				if wait-check entry bit-and 2 is 2:
+					now need-to-skip is true;
+				if hard-mode is true and easy-only entry is true: [stupid whirlpool case]
+					now need-to-skip is true;
+				if hard-mode is false and hard-only entry is true: [other cases such as dragon's lair]
+					now need-to-skip is true;
 				increment row-in-moves;
 				d "[row-in-moves].";
 				choose row row-in-moves in table of gamemoves;
@@ -338,7 +353,7 @@ to dirkmove (a - a number):
 				if right-easy entry bit-xor a > 0:
 					say "But dang it! That almost seemed right, maybe in some slightly easier parallel universe.";
 		if dir-cheat is true:
-			say "safe moves are/were [right-move of X].";
+			say "safe moves are/were [thedirs of X].";
 		if inf-lives is false:
 			decrement lives-left;
 		if lives-left is 0:
@@ -902,7 +917,7 @@ U and Pool Balls	false	false	1	0	32	--	379	--	"You jump over the small gap and h
 Cage and Geyser	false	false	0	0	32	--	915	--	"Well, that wasn't too bad. You jump closer to the door."	"Because you didn't charge the door, the electricity--wait for it[if lastmove bit-and 1 is 1] (oops, you already did)[end if]--charges you!"
 Cage and Geyser	false	false	0	0	32	--	1326	--	"You time the door perfectly! You jump just after it shuts. There's a narrow bridge across, with a huge flume of lava to the left. It sprays every few seconds."	"Hesitating, you time the jump through the door wrong as the electrical current approaches. SNAP!"
 Cage and Geyser	false	false	1	0	8	--	2191	--	"Your classmates made fun of you because you couldn't count, but man, you sure have timing down. The next flume misses you as you run left."	"Perhaps you felt guilty of your impeccable timing. Or perhaps you just have a fear of crumbly bridges. Or you wonder how the bridge survived the first flume. Whichever, it does not matter now where you are."
-Black Knight on Horse	false	true	--	0	36	1939	--	"You jump out of the way of the lightning, but it still sticks your sword in place."	"You never got to the whys in physics class, but you should've known to get out of the way." [??guessing score as dragons-lair-project doesn't have it]
+Black Knight on Horse	false	true	--	0	36	--	1939	--	"You jump out of the way of the lightning, but it still sticks your sword in place."	"You never got to the whys in physics class, but you should've known to get out of the way." [??guessing score as dragons-lair-project doesn't have it]
 Black Knight on Horse	false	false	0	0	8	--	1939	--	"You execute a nice somersault to the left. At least you didn't have to roll backwards! You never quite got the hang of that. The knight comes thundering back on his horse. You got turned around, so the thorns are on your right, now."	"Too bad, Dirk! The black knight rides off with your helmet on his sword. How it got there, you may not have figured, and you may not want to know."
 Black Knight on Horse	false	false	0	0	8	--	1939	--	"You got a weak grade in gymnastics, but you've got the practical part down. Another roll to the left, and you escape the knight again. Oh, look. There's a hole to the right! No thorns!"	"Too bad, Dirk! The black knight rides off with your helmet on his sword. How it got there, you may not have figured, and you may not want to know."
 Black Knight on Horse	false	false	1	0	4	--	2675	--	"You dive for the hole and make it as the sword lashes against you. Enough of this!"	"Too bad, Dirk! The black knight rides off with your helmet on his sword. How it got there, you may not have figured, and you may not want to know."
@@ -981,7 +996,7 @@ Bat King	false	false	0	0	2	--	1326	--	"Well, now the bats are chased, pretty muc
 Bat King	false	false	0	0	8	--	2191	--	"Oop! Some stairs are out ahead. The ones just beyond flash, not like you could go back in this narrow passage. You could just make it if you jump."	"Well, falling means you won't get mobbed by the bats. That's...something."
 Bat King	false	false	0	0	40	--	1326	--	"Oh, hey, how's this for variety? A giant bat that can't fly stumbles out of a doorway and raises his wings. You can't exactly go back."	"Aaaa! That's not the way to jump the gap ahead."
 Bat King	false	false	2	0	2	--	3551	--	"[if hard-mode is true]The bat king flashes as you chop it in half, and then the door behind it to the left follows. Without being cut in half, thankfully[else]You reflexively go left through the door! Or is it up? No time for semantics[end if]."	"You'll never know what a hug from Princess Daphne feels like. Probably better than the one from the Bat King right now, you guess."
-Bat King	false	true	1	0	63	--	49	--	"[if lastmove bit-xor 8 is 8]Left[else]Up[end if] through the door you go to your next challenge."	"While gazing at the door, you're ambushed from behind by bats intent on revenging their fallen king."
+Bat King	false	true	1	0	63	--	49	--	"[if lastmove bit-and 8 is 8]Left[else]Up[end if] through the door you go to your next challenge."	"While gazing at the door, you're ambushed from behind by bats intent on revenging their fallen king."
 Electric Throne	false	false	0	0	4	--	1326	--	"The circular rug continues to roll you up from the left. More of the circle is closing."	"Zzzzzzap! Megavolts, coming right up."
 Electric Throne	false	false	0	0	36	4	3255	--	"The circle's almost closed. The throne is to the right."	"Zzzzzzap! Megavolts, coming right up."
 Electric Throne	false	false	0	0	4	--	2675	--	"The throne spins you around as your scabbard snaps back in place. An electric charge comes along the wire. Yes! A door to the right!"	"Zzzzzzap! Megavolts, coming right up."
@@ -1017,6 +1032,9 @@ Dragon's Lair	false	false	0	0	40	--	4750	--	"[if hard-mode is true]You step back
 Dragon's Lair	false	true	0	0	2	--	4750	--	"The sword deflects the dragon's flame-blast! Quick, Dirk, while it's recharging!"	"Your fear makes you delay. You are stuck. And burnt up. So close, Dirk!"
 Dragon's Lair	false	false	1	0	2	--	5000	--	"You throw the sword. Right in the neck! Singe collapses. You take the key from his neck and unlock Daphne. Mushiness ensues. Way to go, Dirk![paragraph break]Now how do you get out of here?[wfak]While you're thinking, the castle itself begins to crumble. Your adventures caused so much structural damage, the Dragon crashing to its death started off an earthquake. With debris dropping everywhere, you and Daphne can only run towards each flashing door you see. But you're all over that by now, man![wfak]"	"Oh no, Dirk! You fall at the final hurdle[if drag-kill > 1 and lives-left > 1]. Or maybe you know exactly what you're doing--as greedy for maximum points as Singe was for treasure. Daphne sobs as she looks on, uncomprehending. Are those extra points really worth it?[else if lives-left > 1]. Or maybe you're trying for a few last points, like this guy: https://stevenf.com/2014/05/21/arcade-story/?[else if lives-left is 0], and you don't have any chances left. Pathos![end if][in-drag]"
 [togm-end]
+
+to say ye-whirl:
+	say "Just as you worry the next part of the rapids will be a stripe leading into a cavern wall, the water changes to green as -- ding ding -- you are by YE WHIRLPOOLS"
 
 to say in-drag:
 	increment drag-kill;
@@ -1066,7 +1084,7 @@ carry out liing:
 		say "You have a visions of a no fun looking adult [one of][or]once again [stopping]apprehending the two kids with the coin on the string and frog marching them away from the booth. The kids are kicked out![paragraph break]At least they weren't thrown in the castle dungeon off to the side. That's what the place with the scary singing animals must be.";
 	the rule succeeds;
 
-volume beta testing - not for release
+volume beta testing
 
 [I usually have a volume like this so you can comment/uncomment it. My final runthrough (in theory) makes sure the text is gone. Most of my beta testing commands made it to the game proper (li and dircheat) so this is pretty blank.]
 
@@ -1075,31 +1093,32 @@ when play begins:
 	say "Order of rooms:";
 	repeat through table of gameorder:
 		say "[myroom entry][if mirrored entry is true] (flipped)[end if][if hard-mode is true and myroom entry is hard-dif] (more steps in hard mode)[end if][line break]";
-	say "There are several commands here:[line break]--c: this lets the player skip ahead a room[line break]--ch: choose hard, lets the player choose only the rooms that are different in hard mode[paragraph break]";
+	say "There are several commands here:[line break]--j: this lets the player skip ahead a room[line break]--p: (P)ick off hard mode difference rooms[paragraph break]";
 
-chapter cing
+chapter jing
 
 [ * this allows the player to skip a room and call it solved. Except the dragon's lair. ]
 
-cing is an action out of world.
+jing is an action out of world.
 
-understand the command "c" as something new.
+understand the command "j" as something new.
 
-understand "c" as cing.
+understand "j" as jing.
 
-carry out cing:
+carry out jing:
 	if location of player is dragon's lair:
 		say "Sorry, Dirk! Gotta do the last one the hard way!" instead;
+	say "Ok, skipping.";
 	mark-solved;
 	the rule succeeds;
 
-chapter ching
+chapter ping
 
-ching is an action out of world.
+ping is an action out of world.
 
-understand the command "ch" as something new.
+understand the command "p" as something new.
 
-understand "ch" as ching.
+understand "p" as ping.
 
 to decide whether (rm - a room) is hard-dif:
 	repeat through table of gamemoves:
@@ -1108,13 +1127,14 @@ to decide whether (rm - a room) is hard-dif:
 				decide yes;
 	decide no;
 
-carry out ching:
+carry out ping:
 	say "Filtering out rooms that aren't different in hard mode.";
 	move player to outside the castle, without printing a room description;
 	repeat through table of gameorder:
 		if myroom entry is hard-dif:
 			now sol entry is false;
 		else:
+			now vis entry is true;
 			now sol entry is true;
 	pick-next-room;
 	the rule succeeds;
@@ -1169,7 +1189,7 @@ carry out ying:
 			say "Still need to do [myroom entry] - [mirrored entry].";
 	the rule succeeds;
 
-chapter tests
+chapter tests [this takes up so much memory that it forces Dirk to be glulx, so I commented this out and left it as a walkthrough]
 
 [* room tests from 1 to 39]
 
