@@ -227,7 +227,7 @@ to nonshuffle-room-table:
 	choose row 1 in table of gameorder;
 	d-n "[location of player][is-mirrored]";
 	now is-mirrored is mirrored entry;
-	d-n "[is-mirrored]";
+	d-n " [is-mirrored]";
 
 book transcription aids
 
@@ -1070,7 +1070,50 @@ when play begins:
 	say "Generic warning to set beta testing volume to not for release.";
 	say "Order of rooms:";
 	repeat through table of gameorder:
-		say "[myroom entry][if mirrored entry is true] (flipped)[end if][line break]";
+		say "[myroom entry][if mirrored entry is true] (flipped)[end if][if hard-mode is true and myroom entry is hard-dif] (more steps in hard mode)[end if][line break]";
+
+
+chapter cing
+
+[ * this allows the player to skip a room and call it solved. Except the dragon's lair. ]
+
+cing is an action out of world.
+
+understand the command "c" as something new.
+
+understand "c" as cing.
+
+carry out cing:
+	if location of player is dragon's lair:
+		say "Sorry, Dirk! Gotta do the last one the hard way!" instead;
+	mark-solved;
+	the rule succeeds;
+
+chapter ching
+
+ching is an action out of world.
+
+understand the command "ch" as something new.
+
+understand "ch" as ching.
+
+to decide whether (rm - a room) is hard-dif:
+	repeat through table of gamemoves:
+		if myroom entry is rm:
+			if hard-only entry is true:
+				decide yes;
+	decide no;
+
+carry out ching:
+	say "Filtering out rooms that aren't different in hard mode.";
+	move player to outside the castle, without printing a room description;
+	repeat through table of gameorder:
+		if myroom entry is hard-dif:
+			now sol entry is false;
+		else:
+			now sol entry is true;
+	pick-next-room;
+	the rule succeeds;
 
 volume testing - not for release
 
