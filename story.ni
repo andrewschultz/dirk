@@ -31,6 +31,41 @@ before undoing an action:
 check saving the game:
 	say "That's not very intrepid, Dirk![paragraph break]Apropos of nothing, you suddenly see a vision of a kid much weaker than yourself tying a string to a coin and dropping it into a slot in a big, tall booth of some sort. You don't know what he's doing, but it feels wrong!" instead;
 
+book NounDomain
+
+[this is so commands like TWIST, with objects, are kicked to the standard parser error. It should save a ton on memory in "after reading a command."]
+
+Include (-
+Replace NounDomain;
+-) after "Definitions.i6t".
+
+Include (-
+[ NounDomain domain1 domain2 context;
+  return 0;
+];
+-) after "Definitions.i6t".
+
+book get rid of default verbs
+
+[this is so random default commands without objects are kicked to my own help and not Inform's defaults, which are inappropriate for this game]
+
+understand the command "think" as something new.
+understand the command "jump" as something new.
+understand the command "kiss" as something new.
+understand the command "yes" as something new.
+understand the command "no" as something new.
+understand the command "sing" as something new.
+understand the command "wave" as something new.
+understand the command "smell" as something new.
+understand the command "listen" as something new.
+understand the command "exit" as something new.
+understand the command "in" as something new.
+understand the command "out" as something new.
+understand the command "sorry" as something new.
+
+the block thinking rule is not listed in any rulebook.
+the block kissing rule is not listed in any rulebook.
+
 book globals and commands
 
 to ital-say (x - indexed text): [steal this stub to generate instant footnotes.]
@@ -44,6 +79,13 @@ to say cmds:
 
 does the player mean examining the player: it is very likely.
 
+rule for printing a parser error:
+	let A be the number of characters in the player's command;
+	if A > 1:
+		say "Ugh! Long non-fourth-wall [A in words]-letter commands make Dirk's head hurt. Well, there are some meta-commands. But here are the main short ones.[paragraph break][cmds].";
+	else:
+		say "You hear a humming buzz. (To show commands, type H.)";
+
 after reading a command:
 	if the player's command matches the regular expression "^\p" or the player's command matches the regular expression "^<;\*>;":
 		say "[if currently transcripting](Noted for transcript.)[else](Noted, though transcript is not natively on.)[end if]";
@@ -51,86 +93,23 @@ after reading a command:
 	if the player's command matches the regular expression "\.":
 		say "Planning ahead is just not realistic, Dirk! Deal with the immediate obstacle.";
 		reject the player's command;
-	if debug-state is true: [these are meta-commands we don't want to open to the player, because they can really mess up the game state, or they're just used for debugging in Inform in general anyway]
-		if word number 1 in the player's command is "test":
-			continue the action;
-		if word number 1 in the player's command is "gt":
-			continue the action;
-		if word number 1 in the player's command is "db":
-			continue the action;
-		if word number 1 in the player's command is "restart":
-			continue the action;
-		if word number 1 in the player's command is "rules":	
-			continue the action;
-	let QQ be "[word number 1 in the player's command]";
-	if word number 1 in the player's command is "save": [these are meta-commands we always need to check on. Also YES I KNOW CLEAN UP THIS CODE]
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "quit":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "dethmsg":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "c":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "ch":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "xyzzy":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "about":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "credits":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "credit":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "transcript":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "dircheat":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "li":
-		change the text of the player's command to QQ;
-		continue the action;
-	if word number 1 in the player's command is "x" or word number 1 in the player's command is "examine":
+	let W1 be word number 1 in the player's command;
+	if W1 is "x" or W1 is "examine":
 		say "You aren't given to reflection, much, Dirk. But you know how to react when something's not right. Also, the looks thing: in your orange tunic over what seems to be armor, and that pointy metal hat, with that backpack too. I don't know what's in there, and I won't ask, because that would be rude even if you weren't too busy running and fighting.";
 		reject the player's command;
-	let B be the number of words in the player's command;
-	if B > 1:
-		say "You can process complex sentences much better than your mean classmates gave you credit for, Dirk. But worrying about nice long beautiful [B in words]-word sentences right now may be the difference between life and death.[paragraph break]Commands: [cmds].";
-		reject the player's command;
-	let A be the number of characters in the player's command;
-	if A > 1:
-		say "Ugh! Long non-fourth-wall [A in words]-letter commands make Dirk's head hurt. Well, there are some meta-commands. But here are the main short ones.[paragraph break][cmds].";
+	if the number of words in the player's command > 1:
+		say "You can process complex sentences much better than your mean classmates gave you credit for, Dirk. But worrying about nice long beautiful sentences right now may be the difference between life and death.[paragraph break]Commands: [cmds].";
 		reject the player's command;
 	if the player's command matches the regular expression "<\?>":
 		try hing instead;
-	if word number 1 in the player's command is "t":
-		if currently transcripting:
-			try switching the story transcript off;
-		else:
-			try switching the story transcript on;
-		reject the player's command;
-	if the player's command matches the regular expression "<uldrhsacz>":
-		do nothing;
-	else:
-		say "You hear a humming buzz. (To show commands, type H.)";
-		reject the player's command;
 	continue the action;
 		
 Rule for printing a parser error when the latest parser error is the I beg your pardon error:
 	if moved-in-room is false:
 		try looking;
 	else:
-		d "Row [row-in-moves].";
-		choose row row-in-moves - 1 in table of gamemoves;
+		d "Row [last-row].";
+		choose row last-row in table of gamemoves;
 		say "LAST OBSERVATION: [yay entry][paragraph break](To show commands, type H.)[paragraph break]";
 	reject the player's command;
 
@@ -141,6 +120,8 @@ Outside the Castle is a room. "You walk across the moat's drawbridge, which coll
 hard-mode is a truth state that varies.
 
 debug-state is a truth state that varies.
+
+in-beta is a truth state that varies.
 
 tthouscore is a number that varies. [this is the glulx workaround. basescore is your score, mod 10000.]
 basescore is a number that varies. [I think I got this idea from Ryan Veeder saying he'd have written Taco Fiction in Glulx, except for needing $50k for money. So I looked for a solution.]
@@ -284,10 +265,13 @@ to decide whether (fi - a number) is last-in-room:
 		decide yes;
 	decide no;
 
+last-row is a number that varies.
+
 to dirkmove (a - a number):
 	now lastmove is a;
 	d "1.";
 	choose row row-in-moves in table of gamemoves;
+	now last-row is row-in-moves;
 	if a is 1:
 		if wait-check entry bit-and 1 is 1:
 			say "[wait-txt entry][line break]";
@@ -330,11 +314,11 @@ to dirkmove (a - a number):
 				pick-next-room;
 				prime-next-area;
 		otherwise:
-			increment row-in-moves;
 			d "Current row row-in-moves.";
 			let need-to-skip be true;
-			choose row row-in-moves in table of gamemoves;
 			while need-to-skip is true:
+				increment row-in-moves;
+				choose row row-in-moves in table of gamemoves;
 				now need-to-skip is false;
 				if wait-check entry bit-and 2 is 2:
 					now need-to-skip is true;
@@ -342,16 +326,14 @@ to dirkmove (a - a number):
 					now need-to-skip is true;
 				if hard-mode is false and hard-only entry is true: [other cases such as dragon's lair]
 					now need-to-skip is true;
-				increment row-in-moves;
 				d "[row-in-moves].";
-				choose row row-in-moves in table of gamemoves;
 	otherwise:
 		d "Oops! Death message.";
 		say "[if a is 1 and there is a wait-txt entry][wait-txt entry][else][boo entry][end if]";
 		if hard-mode is true:
 			if there is a right-hard entry:
 				if right-easy entry bit-xor a > 0:
-					say "But dang it! That almost seemed right, maybe in some slightly easier parallel universe.";
+					say " But dang it! That almost seemed right, maybe in some slightly easier parallel universe.";
 		if dir-cheat is true:
 			say "safe moves are/were [thedirs of X].";
 		if inf-lives is false:
@@ -484,13 +466,28 @@ check waiting:
 	dirkmove 1;
 	the rule succeeds;
 
+chapter ting
+
+ting is an action out of world.
+
+understand the command "t" as something new.
+
+understand "t" as ting.
+
+carry out ting:
+	if currently transcripting:
+		try switching the story transcript off;
+	else:
+		try switching the story transcript on;
+	the rule succeeds;
+
 chapter uing
 
 uing is an action applying to nothing.
 
-understand the command "u" as something new.
+understand the command "u/f" as something new.
 
-understand "u" as uing.
+understand "u" and "f" as uing.
 
 carry out uing:
 	dirkmove 32;
@@ -584,9 +581,11 @@ understand the command "h" as something new.
 understand "h" as hing.
 
 carry out hing:
-	say "U/D/L/R moves Dirk up down left or right. S uses his sword.";
+	say "U/D/L/R moves Dirk up down left or right. S uses his sword. F (forward) can be substituted for U.";
 	say "(A)BOUT and (C)REDITS are also commands. You can take a (T)RANSCRIPT if you find a bug.";
 	say "A blank command will let you look. If you've already moved in your current room, it will print the last thing that happened[one of]. This may be useful right now[or][stopping].";
+	if in-beta is true:
+		say "There are two tester commands, too: J lets you jump past this room, and P picks off rooms different in easy vs. hard.";
 	the rule succeeds;
 
 book shuffle-room-table
@@ -870,12 +869,12 @@ to say dirk-snk:
 
 table of gamemoves [togm]
 myroom	easy-only	hard-only	finished	wait-check	right-easy	right-hard	points	reverse	yay	boo	wait-txt
-Flaming Pit	false	false	0	1	4	4	251	379	"You grab onto a rope. The timing's easy enough. Another swings back from the [r-l]."	"The ledge you were on retracts fully. You fall screaming to your doom."	"You fidget nervously, watching the ledge almost retract. Way to make it tougher! Still, you can hear the noises of the ropes swinging back and forth..."
+Flaming Pit	false	false	0	1	4	--	251	379	"You grab onto a rope. The timing's easy enough. Another swings back from the [r-l]."	"The ledge you were on retracts fully. You fall screaming to your doom."	"You fidget nervously, watching the ledge almost retract. Way to make it tougher! Still, you can hear the noises of the ropes swinging back and forth..."
 Flaming Pit	false	false	0	2	4	--	100	100	"Using only your senses, you grab onto the rope as it comes back! Ok, it might've been easier if you weren't looking down in fear at the almost-retracted ledge, but details."	"Unable to grab the swinging rope to the [r-l], you fall screaming into the pit."	"That was a bit TOO long to wait, Dirk. A rapidly accelerating fall follows your inaction."
 Flaming Pit	false	false	0	0	4	--	379	495	"You grab the next rope, not thinking about it. The eggheads up on adventure theory might think a second too long and draw parabolas in their head and calculate things to three significant figures, but not you, Dirk. Ooh! Anther rope swings back from the [r-l]."	"[obliv]."	"Y[rope-wait]."
 Flaming Pit	false	false	0	0	4	--	495	495	"You grab the next rope yet again, not even worrying if you might mess this up. Oh, hey! There's a ledge to the [r-l]! You reach out your hand reflexively."	"[obliv]."	"This time, y[rope-wait]."
 Flaming Pit	false	false	1	0	4	--	915	915	"You jump off the rope and onto the ledge and through the door."	"At the last minute, you decide to jump [r-l], but you don't have enough momentum. Your feet wobble on the edge of the ledge you jump on. You fall into the pit. Boo, physics."	"This time, y[rope-wait]."
-Closing Wall	false	false	1	0	32	--	379	379	"You jump through the wall and land awkwardly but safely."	"You look for a way around the wall, then try to sneak through as it shuts. You make it halfway, which isn't good enough."	"The wall closes, then poison gas seeps in from all around. Well, that bed will be a nice comfy final resting place."
+Closing Wall	false	false	1	0	32	32	379	379	"You jump through the wall and land awkwardly but safely."	"You look for a way around the wall, then try to sneak through as it shuts. You make it halfway, which isn't good enough."	"The wall closes, then poison gas seeps in from all around. Well, that bed will be a nice comfy final resting place."
 Horsing Around Walls and Fire	false	false	0	0	4	--	495	495	"You avoid the fire to the [l-r] so well that you're now careening towards a fire on the [r-l]. Hooray, variety."	"You and your horse crash into the fire to the [r-l]. HOT HOT HOT!"
 Horsing Around Walls and Fire	false	false	0	0	8	--	495	495	"You avoid the fire to the [r-l]. Now there's fire on the [l-r]. And a pillar up ahead!"	"You and your horse crash into the fire to the [l-r]. HOT HOT HOT!"
 Horsing Around Walls and Fire	false	false	0	0	4	--	495	495	"You avoid the pillar and the fire. Now there's fire on the [r-l] with a pillar ahead."	"You and your horse crash into the fire to the [r-l] HOT HOT HOT!."
@@ -896,8 +895,8 @@ Underground River	false	false	0	0	4	--	379	--	"Blam! Four for four! As the water
 Underground River	false	false	0	0	36	--	495	--	"Yup, you'll be okay as long as you remember to row from the opposite side. Now that stripe is left and up."	"[or-scen]."
 Underground River	false	false	0	0	40	--	495	--	"Bang on again, Dirk. You're almost too cool for school. Now that stripe is right and up."	"[or-scen]."
 Underground River	false	false	0	0	36	--	495	--	"Now it's left and up. It's like military camp with the left right left right!"	"[or-scen]."
-Underground River	true	false	0	0	40	--	495	--	"[ye-whirl]There's one to the left."	"[or-scen]."
-Underground River	false	false	0	0	4	--	251	--	"[if hard-mode is true][ye-whirl][else]The whirlpool may be going somewhere interesting, but not any good. [end if]Whirlpool to the right."	"[whirl-d]."
+Underground River	false	false	0	0	40	--	495	--	"[ye-whirl]. There's one to the [if hard-mode is true]right[else]left[end if] you should probably avoid."	"[or-scen]."
+Underground River	true	false	0	0	4	--	251	--	"Splash, splash. You're strong enough to paddle away from the whirlpool. Now there's one to the right."	"[whirl-d]."
 Underground River	false	false	0	0	8	--	251	--	"You paddle towards the whirlpool, then away. That's a trick those eggheads in adventuring class would never try! You forget why it works, but doing not thinking matters now. Whirlpool to the left."	"[whirl-d]."
 Underground River	false	false	0	0	4	--	251	--	"Again with the contrary paddling. Whirlpool to the right."	"[whirl-d]."
 Underground River	false	false	0	0	8	--	251	--	"One more reverse-paddle, for Roman Hruska. The water picks up speed. You're thrown into the air. But there's a chain there, up and to the right. It flashes and dings, making it 25% more grabbable, or something."	"[whirl-d]."
@@ -1065,7 +1064,7 @@ understand "dircheat" as dircheating.
 
 carry out dircheating:
 	now dir-cheat is whether or not dir-cheat is false;
-	say "Direction cheating is now [if dir-cheat is true]on[else]off[end if].";
+	say "Direction cheating on wrong moves is now [if dir-cheat is true]on[else]off[end if].";
 	the rule succeeds;
 
 chapter liing
@@ -1084,16 +1083,19 @@ carry out liing:
 		say "You have a visions of a no fun looking adult [one of][or]once again [stopping]apprehending the two kids with the coin on the string and frog marching them away from the booth. The kids are kicked out![paragraph break]At least they weren't thrown in the castle dungeon off to the side. That's what the place with the scary singing animals must be.";
 	the rule succeeds;
 
-volume beta testing
+volume beta testing - not for release
 
 [I usually have a volume like this so you can comment/uncomment it. My final runthrough (in theory) makes sure the text is gone. Most of my beta testing commands made it to the game proper (li and dircheat) so this is pretty blank.]
 
 when play begins:
-	say "Generic warning to set beta testing volume to not for release.";
-	say "Order of rooms:";
-	repeat through table of gameorder:
-		say "[myroom entry][if mirrored entry is true] (flipped)[end if][if hard-mode is true and myroom entry is hard-dif] (more steps in hard mode)[end if][line break]";
-	say "There are several commands here:[line break]--j: this lets the player skip ahead a room[line break]--p: (P)ick off hard mode difference rooms[paragraph break]";
+	now in-beta is true;
+	say "**BEGIN TEXT THAT ONLY APPEARS IN BETA**[line break]";
+	say "Do you wish to list the order of rooms?";
+	if the player consents:
+		repeat through table of gameorder:
+			say "[myroom entry][if mirrored entry is true] (flipped)[end if][if hard-mode is true and myroom entry is hard-dif] (more steps in hard mode)[end if][line break]";
+		say "[line break]";
+	say "There are several commands here:[line break]--j: (J)ump ahead a room, considering this one solved[line break]--p: (P)ick off hard mode difference rooms[paragraph break]";
 
 chapter jing
 
@@ -1110,6 +1112,8 @@ carry out jing:
 		say "Sorry, Dirk! Gotta do the last one the hard way!" instead;
 	say "Ok, skipping.";
 	mark-solved;
+	pick-next-room;
+	prime-next-area;
 	the rule succeeds;
 
 chapter ping
