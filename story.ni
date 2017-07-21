@@ -103,7 +103,7 @@ after reading a command:
 	if the player's command matches the regular expression "<\?>":
 		try hing instead;
 	continue the action;
-		
+
 Rule for printing a parser error when the latest parser error is the I beg your pardon error:
 	if moved-in-room is false:
 		try looking;
@@ -164,7 +164,7 @@ to say xtrazero: [A hack so 50002 doesn't become 52.]
 to first-status: (- DrawStatusLine(); -); [inform 6 to draw "unique" status line before play begins]
 
 when play begins (this is the main start rule):
-	choose row with a final response rule of immediately undo rule in the Table of Final Question Options; 
+	choose row with a final response rule of immediately undo rule in the Table of Final Question Options;
 	delete the final question wording entry; [no UNDO on game end]
 	now left hand status line is "Adventurers['] Guild";
 	now right hand status line is "INSERT 50 CENTS";
@@ -202,7 +202,7 @@ to init-room-table:
 	repeat through table of gameorder:
 		now sol entry is false;
 		now vis entry is false;
-	
+
 to nonshuffle-room-table:
 	let rnum be 0;
 	repeat through table of gameorder:
@@ -654,7 +654,7 @@ to prime-next-area:
 				now moved-in-room is false;
 				the rule succeeds;
 	say "BUG NO ROOM FOUND";
-	
+
 to shuffle-room-table: [this arranges the rooms in pods of 3, except for the last]
 	now rooms-in-seq is number of rows in table of gameorder / 3; [13, but just being exact]
 	let A be a list of numbers;
@@ -673,7 +673,7 @@ to shuffle-room-table: [this arranges the rooms in pods of 3, except for the las
 		choose row cur-room + extra in the table of gameorder;
 		increase the gameord entry by 13;
 	sort table of gameorder in gameord order;
-	
+
 to print-out-litany: [this is for debug purposes]
 	let XX be indexed text;
 	repeat through table of gameorder:
@@ -812,7 +812,7 @@ to say r-l:
 		say "left";
 	otherwise:
 		say "right";
-		
+
 to say l-r:
 	if is-mirrored is true:
 		say "right";
@@ -1037,7 +1037,7 @@ to say ye-whirl:
 
 to say in-drag:
 	increment drag-kill;
-	
+
 to say mudmon-yay:
 	say "With no resistance, the monsters stuff you in a mud stream. You become one of them. It's not so bad. Who knows, you might help the next adventurer to join in your zen. If you remember what an adventurer is by that time. All you need to do is live your life straightforwardly as time goes ahead and ahead. Surely running the mud monster gauntlet couldn't have been that easy...or could it?"
 
@@ -1046,7 +1046,7 @@ to say woulda-quick:
 
 to say tent-die:
 	say "Unable to find an unblocked way, you stay and try to flail your sword as more tentacles appear, but it does no good. As they grab you, you remember being told you need to know when to flee. But then, you also remember being told it won't be anything obvious like a flashing door. This enrages you further as you realize the truth in your final moment"
-	
+
 to say konk:
 	say "KONK! You pass out with a goofy smile on your face. That's...something. The lizard king drags you away"
 
@@ -1161,7 +1161,7 @@ carry out gting:
 	now is-mirrored is mirrored entry; [important or else the descriptions can be reversed]
 	prime-next-area;
 	the rule succeeds.
-	
+
 chapter dbing
 
 [* this edits the debug state]
