@@ -280,6 +280,10 @@ to dirkmove (a - a number):
 	if (X bit-and a) is a:
 		now moved-in-room is true;
 		say "[yay entry][line break]";
+		if block-progress is true:
+			now block-progress is false;
+			say "NOTE: progress is blocked for testing purposes.";
+			continue the action;
 		if show-death-msg is true: [debugging]
 			say "Boo entry: [boo entry][line break]";
 		if is-mirrored is false:
@@ -321,7 +325,7 @@ to dirkmove (a - a number):
 				d "[row-in-moves].";
 	otherwise:
 		d "Oops! Death message.";
-		say "[if a is 1 and there is a wait-txt entry][wait-txt entry][else][boo entry][end if]";
+		say "[if a is 1 and there is a wait-txt entry][wait-txt entry][else][boo entry][end if][line break]";
 		if super-testing is true:
 			say "Because I am super-testing, I am skipping this death move. You can try again.";
 			continue the action;
@@ -500,6 +504,8 @@ carry out ding:
 	dirkmove 16;
 	the rule succeeds;
 
+chapter jing (see beta version)
+
 chapter ling
 
 ling is an action applying to nothing.
@@ -548,7 +554,7 @@ carry out sing:
 	dirkmove 2;
 	the rule succeeds;
 
-chapter zing
+chapter zing (waiting)
 
 zing is an action applying to nothing.
 
@@ -556,16 +562,9 @@ understand the command "z" as something new.
 
 understand "z" as zing.
 
-carry out zing:
-	if debug-state is false:
-		say "You're generally a man of action, Dirk, unless if nasty math story problems are involved.";
-		try waiting instead;
-	let A be location of player;
-	say "Jumping to next area for debug purposes.";
-	mark-solved;
-	pick-next-room;
-	prime-next-area;
-	the rule succeeds;
+check waiting:
+	say "You're generally a man of action, Dirk, unless that action involves getting to the library to study up on adventuring theory.";
+	try waiting instead;
 
 chapter hing
 
@@ -696,11 +695,11 @@ to mirror-check:
 
 book in-order
 
-Flaming Pit is a doubled room. "There're three ropes here swinging back and forth to the [r-l]. There's a ledge beyond them. The one you're on is currently retracting."
+Flaming Pit is a doubled room. "There're three ropes here swinging back and forth to the [r-l]. There's a ledge beyond them. The one you're on is currently retracting. You can't go back [l-r]."
 
 Closing Wall is a room. "A wall is rapidly closing in front of you. And the ones to the left and right don't look to be opening any time soon."
 
-There is a room called Horsing Around Walls and Fire. it is doubled. "Oh, look! A[one of][or]nother[stopping] horse with a gem on top! You forget your mission, distracted by the wrong sort of something shiny--treasure, not a passageway. [one of][or]Maybe this time... [stopping]When you climb on, the horse takes off. Your horse swerves [l-r], almost smack into a fireplace."
+There is a room called Horsing Around Walls and Fire. it is doubled. "Oh, look! A[one of][or]nother[stopping] horse with a gem on top! You forget your mission, distracted by the wrong sort of something shiny--treasure, not a passageway. [one of][or]Maybe this time... [stopping]When you climb on, the horse takes off at an alarming speed. Your horse swerves almost smack into a fireplace ahead and to the [l-r]."
 
 Drink Me is a room. "A small room. You walk towards an icky potion ahead of you with a big DRINK ME sign. This leaves you suspicious! If it were nutritious, there'd be a picture of someone even more muscular than you. Duh.[paragraph break]There's also a door to the right. What to do?"
 
@@ -1140,6 +1139,21 @@ carry out ping:
 	the rule succeeds;
 
 volume testing - not for release
+
+chapter bling
+
+bling is an action applying to nothing.
+
+understand the command "bl" as something new.
+
+understand "bl" as bling.
+
+block-progress is a truth state that varies.
+
+carry out bling:
+	now block-progress is true;
+	say "Progress for next successful move blocked.";
+	the rule succeeds.
 
 chapter sting
 
