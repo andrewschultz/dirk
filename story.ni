@@ -322,6 +322,9 @@ to dirkmove (a - a number):
 	otherwise:
 		d "Oops! Death message.";
 		say "[if a is 1 and there is a wait-txt entry][wait-txt entry][else][boo entry][end if]";
+		if super-testing is true:
+			say "Because I am super-testing, I am skipping this death move. You can try again.";
+			continue the action;
 		if hard-mode is true:
 			if there is a right-hard entry:
 				if right-easy entry bit-xor a > 0:
@@ -1137,6 +1140,21 @@ carry out ping:
 	the rule succeeds;
 
 volume testing - not for release
+
+chapter sting
+
+sting is an action applying to nothing.
+
+understand the command "st" as something new.
+
+understand "st" as sting.
+
+super-testing is a truth state that varies.
+
+carry out sting:
+	now super-testing is whether or not super-testing is false;
+	say "Super-testing is now [on-off of super-testing].";
+	the rule succeeds.
 
 chapter gting
 
