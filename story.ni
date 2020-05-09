@@ -107,6 +107,9 @@ after reading a command:
 	continue the action;
 
 Rule for printing a parser error when the latest parser error is the I beg your pardon error:
+	try taking inventory instead;
+
+check taking inventory:
 	if moved-in-room is false:
 		try looking;
 	else:
@@ -570,9 +573,9 @@ understand the command "h" as something new.
 understand "h" as hing.
 
 carry out hing:
-	say "U/D/L/R moves Dirk up down left or right. S uses his sword. F (forward) can be substituted for U.";
-	say "(A)BOUT and (C)REDITS are also commands. You can take a (T)RANSCRIPT if you find a bug.";
-	say "A blank command will let you look. If you've already moved in your current room, it will print the last thing that happened[one of]. This may be useful right now[or][stopping].";
+	say "Here are the main commands: [b]U[r]/[b]D[r]/[b]L[r]/[b]R[r] moves Dirk up, down, left or right. [b]S[r] uses his sword. [b]F[r] (forward) can be substituted for U.";
+	say "[b]A[r] for ABOUT and [b]C[r] for CREDITS are also commands. You can take a [b]T[r] (TRANSCRIPT) if you want, or if you found a bug you may wanr ro reproduce..";
+	say "A blank command, or [b]I[r], will let you look. If you've already moved in your current room, it will print the last thing that happened[one of]. This may be useful right now[or][stopping].";
 	if in-beta is true:
 		say "There are two tester commands, too: J lets you jump past this room, and P picks off rooms different in easy vs. hard.";
 	the rule succeeds;
@@ -1078,13 +1081,14 @@ volume beta testing - not for release
 
 when play begins:
 	now in-beta is true;
-	say "**BEGIN TEXT THAT ONLY APPEARS IN BETA**[line break]";
-	say "Do you wish to list the order of rooms?";
-	if the player consents:
-		repeat through table of gameorder:
-			say "[myroom entry][if mirrored entry is true] (flipped)[end if][if hard-mode is true and myroom entry is hard-dif] (more steps in hard mode)[end if][line break]";
-		say "[line break]";
-	say "There are several commands here:[line break]--j: (J)ump ahead a room, considering this one solved[line break]--p: (P)ick off hard mode difference rooms[paragraph break]";
+	if debug-state is false:
+		say "**BEGIN TEXT THAT ONLY APPEARS IN BETA**[line break]";
+		say "Do you wish to list the order of rooms?";
+		if the player consents:
+			repeat through table of gameorder:
+				say "[myroom entry][if mirrored entry is true] (flipped)[end if][if hard-mode is true and myroom entry is hard-dif] (more steps in hard mode)[end if][line break]";
+			say "[line break]";
+		say "There are several commands here:[line break]--j: (J)ump ahead a room, considering this one solved[line break]--p: (P)ick off hard mode difference rooms[paragraph break]";
 
 chapter jing
 
