@@ -8,6 +8,8 @@ include Bitwise Operators by Bart Massey.
 
 include Undo Output Control by Erik Temple.
 
+include Trivial Niceties by Andrew Schultz.
+
 include Basic Screen Effects by Emily Short.
 
 [to navigate this document, here are some codes I put in the text.
@@ -163,29 +165,32 @@ to say xtrazero: [A hack so 50002 doesn't become 52.]
 
 to first-status: (- DrawStatusLine(); -); [inform 6 to draw "unique" status line before play begins]
 
+table of intro texts
+my-text
+"Well, Dirk, you got the booby prize. And that's fine by you. Other graduates of the adventuring academy got stuff where they had to be concerned about constitution, hit points, dice rolls, and so forth. You did better at just bashing through. Everyone looked pityingly at you as you were handed your big mission ..."
+"... to rescue Princess Daphne from Singe the Dragon![paragraph break]You heard some classmates snicker. Sure, she was pretty, but she wasn't smart enough for them. And worse ... the adventure was rumored to be no more difficult than a multiple choice test."
+"Those meanies made fun of you for everything, even the stuff you knew, like knowing left from right, or up from down. And now some have cushy jobs teaching adventuring theory, or toadying demigods, or whatever. Boring! It really confused you, how all this being mean was (so they said) for the Social Good."
+"As you walked out of adventuring school for the last time, you heard the jibes: the quest was little more than a multiple-choice test! Of course [b]THEY[r] could beat Singe, but there was no real [b]CHALLENGE[r], except for the part where you had to be strong or get the timing right."
+"Along the way to Singe's Castle, you ran into an old wise man. Would it really be as easy as one of those four-question multiple choice tests?"
+"No! It would be tougher! Five choices! But if you used your intuition and common sense, you'd be okay. Just, he sensed you were good at being distracted by stuff that flashes and following it without thinking. That would work most of the time. Except if it was flashy treasure."
+"Wow! That was helpful! You feel confident you can do it now."
+
 when play begins (this is the main start rule):
 	choose row with a final response rule of immediately undo rule in the Table of Final Question Options;
 	delete the final question wording entry; [no UNDO on game end]
 	now left hand status line is "Adventurers['] Guild";
 	now right hand status line is "INSERT 50 CENTS";
 	first-status;
-	say "Well, Dirk, you got your chance. The 'progressive' institute for adventurers emphasized more than just the physical angle that came naturally to you. It emphasized mental stuff--like sines and cosines over just being able to jump a real long way. But what really hurt was how the other adventurers told you you were nice and all but would never amount to much. That you could never do anything for The Social Good. That confused you. Being mean wasn't good, so how could they be chosen for doing bigger good things?";
-	wait for any key;
-	say "[line break]";
-	say "But man, they made fun of you for everything, even the stuff you knew: like knowing your left from your right. 'Everyone knows that! When'll that be helpful?'[paragraph break]They all got their various quests. Some got cushy teaching jobs. Some became sub-toadies for demigods. But you--you, well, there was word of Princess Daphne, held by the dragon Singe.";
-	wait for any key;
-	say "[line break]";
-	say "Your classmates jibed she was as un-smart as you. They even said the quest was beneath them, too silly if you looked at it right. Little more than a multiple choice test. Of course they could beat Singe the dragon, but it'd be a loss if anything in Singe's castle was unfair. You had to be street-smart. Dragons were like that. Plus there was no proof such a quest would advance society.";
-	wait for any key;
-	say "[line break]";
-	say "When you asked a retired adventurer, he mentioned it might be a bit trickier than the four-answer multiple choice tests that plagued you. There might be FIVE choices! 'But Dirk, I believe in you. Some of those questions may be loaded. You have the reflexes, the timing.'[paragraph break]'But if the questions are loaded, doesn't that mean they're extra hard?'[paragraph break]'Just use your common sense, Dirk, and don't overthink everything. Those eggheads, they'll consider how things that help [']em are physically impossible, and at least they'll feel smart when they die. They'd rather spend hours studying what they calculate is inside the castle than rely on their reflexes. That won't happen with you. Um, I mean, there--you'll keep focused on what's important. Like, you're good at being distracted by stuff that flashes. And shiny things in general. That'll help.'[paragraph break]Wow! Nobody ever put it that way before!";
-	wait for any key;
-	say "[line break]'In fact, you're so good, just say the word and you'll get a bit of extra challenge.' (type yes for hard mode)";
-	if the player consents:
-		now hard-mode is true;
-	else:
-		now hard-mode is false;
-	say "You hear the sounds of two coins falling. You blink, and you're outside an eerie castle.";
+	repeat through table of intro texts:
+		say "[my-text entry][paragraph break]";
+		if debug-state is false, wait for any key;
+	say "[line break]Before you leave, the wise man asks: 'In fact, you're so good, just say the word and you'll get a bit of extra challenge.' (type yes for hard mode)";
+	if debug-state is false:
+		if the player consents:
+			now hard-mode is true;
+		else:
+			now hard-mode is false;
+	say "You hear the sounds of two coins falling into a strange metal abyss. You blink, and you're outside the eerie castle you saw a picture of.";
 	now player is in Outside the Castle;
 	now left hand status line is "[location of the player]";
 	now lives-left is 3;
@@ -215,22 +220,6 @@ to nonshuffle-room-table:
 	d-n "[location of player][is-mirrored]";
 	now is-mirrored is mirrored entry;
 	d-n " [is-mirrored]";
-
-book transcription aids
-
-Include (-
-[ CheckTranscriptStatus;
-#ifdef TARGET_ZCODE;
-return ((0-->8) & 1);
-#ifnot;
-return (gg_scriptstr ~= 0);
-#endif;
-];
--).
-
-To decide whether currently transcripting: (- CheckTranscriptStatus() -)
-
-[thanks to Zarf for the above code. It helps a tester make sure they're testing after their first comment. Feel free to borrow/steal it. I use it in conjunction with "after reading a command."]
 
 book operations
 
@@ -289,7 +278,7 @@ to dirkmove (a - a number):
 		now moved-in-room is true;
 		say "[yay entry][line break]";
 		if show-death-msg is true: [debugging]
-			ital-say "[boo entry]";
+			say "Boo entry: [boo entry][line break]";
 		if is-mirrored is false:
 			bumpscore points entry;
 		else:
