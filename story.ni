@@ -269,6 +269,8 @@ to dirkmove (a - a number):
 			say "[wait-txt entry][line break]";
 			increment row-in-moves;
 			the rule succeeds;
+		say "You're generally a man of action, Dirk, unless that action involves getting to the library to study up on adventuring theory.";
+		continue the action;
 	let X be right-easy entry;
 	if hard-mode is true and there is a right-hard entry:
 		now X is right-hard entry;
@@ -461,10 +463,6 @@ carry out abouting:
 	say "Incidentally, this game is based on 'easy mode.' But 'hard mode' might be a post-comp release, because I saw how to design it the day before comp entries were due.[paragraph break]Transcripts are welcome at [email]. I'm sure I missed a few jokes.[paragraph break]";
 	the rule succeeds;
 
-check waiting:
-	dirkmove 1;
-	the rule succeeds;
-
 chapter ting
 
 ting is an action out of world.
@@ -556,15 +554,9 @@ carry out sing:
 
 chapter zing (waiting)
 
-zing is an action applying to nothing.
-
-understand the command "z" as something new.
-
-understand "z" as zing.
-
 check waiting:
-	say "You're generally a man of action, Dirk, unless that action involves getting to the library to study up on adventuring theory.";
-	try waiting instead;
+	dirkmove 1;
+	the rule succeeds;
 
 chapter hing
 
@@ -864,7 +856,7 @@ to say dirk-snk:
 table of gamemoves [togm]
 myroom	easy-only	hard-only	finished	wait-check	right-easy	right-hard	points	reverse	yay	boo	wait-txt
 Flaming Pit	false	false	0	1	4	--	251	379	"You grab onto a rope. The timing's easy enough. Another swings back from the [r-l]."	"The ledge you were on retracts fully. You fall screaming to your doom."	"You fidget nervously, watching the ledge almost retract. Way to make it tougher! Still, you can hear the noises of the ropes swinging back and forth..."
-Flaming Pit	false	false	0	2	4	--	100	100	"Using only your senses, you grab onto the rope as it comes back! Ok, it might've been easier if you weren't looking down in fear at the almost-retracted ledge, but details."	"Unable to grab the swinging rope to the [r-l], you fall screaming into the pit."	"That was a bit TOO long to wait, Dirk. A rapidly accelerating fall follows your inaction."
+Flaming Pit	false	false	0	2	4	--	100	100	"Using your reflexes and adventurer's intuition, you grab onto the rope as it comes back! Ok, it might've been easier if you weren't looking down in fear at the almost-retracted ledge, but details."	"Unable to grab the swinging rope to the [r-l], you fall screaming into the pit."	"That was a bit TOO long to wait, Dirk. A rapidly accelerating fall follows your inaction."
 Flaming Pit	false	false	0	0	4	--	379	495	"You grab the next rope, not thinking about it. The eggheads up on adventure theory might think a second too long and draw parabolas in their head and calculate things to three significant figures, but not you, Dirk. Ooh! Anther rope swings back from the [r-l]."	"[obliv]."	"Y[rope-wait]."
 Flaming Pit	false	false	0	0	4	--	495	495	"You grab the next rope yet again, not even worrying if you might mess this up. Oh, hey! There's a ledge to the [r-l]! You reach out your hand reflexively."	"[obliv]."	"This time, y[rope-wait]."
 Flaming Pit	false	false	1	0	4	--	915	915	"You jump off the rope and onto the ledge and through the door."	"At the last minute, you decide to jump [r-l], but you don't have enough momentum. Your feet wobble on the edge of the ledge you jump on. You fall into the pit. Boo, physics."	"This time, y[rope-wait]."
