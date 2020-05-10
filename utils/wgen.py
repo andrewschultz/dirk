@@ -13,7 +13,7 @@ in_table = False
 bracket_replace = defaultdict(str)
 doubled_dict = defaultdict(bool)
 
-move_array = move_ary = [ 'Z', 'S', 'R', 'L', 'D', 'F' ]
+move_array = move_ary = [ 'z', 's', 'r', 'l', 'd', 'f' ]
 
 def show_left_right(my_string, unmirrored = True):
     x = mt.no_quotes(my_string.replace("[l-r]", "left" if unmirrored else "right"))
@@ -43,6 +43,13 @@ this_room_string = ''
 last_room = ''
 failure = ''
 success = ''
+
+with open("wgen.txt") as file:
+    for (line_count, line) in enumerate(file, 1):
+        if line.startswith(";"): break
+        if line.startswith("#"): continue
+        a = line.strip().split("\t")
+        bracket_replace["[" + a[0] + "]"] = a[1]
 
 with open("story.ni") as file:
     for (line_count, line) in enumerate(file, 1):
