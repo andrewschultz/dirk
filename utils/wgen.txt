@@ -1,0 +1,16 @@
+disc-jump-miss	You had one guess, and it was a pretty obvious one--but you missed! Well, the jump bought you an extra half-second of self-reflection
+u-nfair	. Being smooshed, you don't care about the details. Up being down and down being up in this room didn't help, either
+horse-fly	Your horse flies into the wall. You and your horse crumble to pieces. It'd be sort of funny, if it happened to someone mean
+splat-pur	Splat! You failed to avoid a wall and sink into the purple depths.
+or-scen	You could not steer to the safety of the garish orange strip! At least your last moments are filled with color.
+whirl-d	The whirlpool sucks you in! You have an acute view of green water before things go dark
+obliv	Oblivious of the swinging rope to the [r-l], you fall into the pit
+rope-wait	ou hold onto the rope until the flame reaches your hands. It gives you a few more seconds than if you'd timed a jump to the [r-l]
+disc-good-jump	Not too bad a jump. Half the ledge collapses, but amazingly, your half remains perfectly horizontal. There's no time to worry about the physics, here, or even how the castle seemed so small from the outside but there's so much inside, and the undergound bit is why
+dirk-snk	The door burns up as you go to touch it. You needed a sneakier way out, Dirk
+ye-whirl	Just as you worry the next part of the rapids will be a stripe leading into a cavern wall, the water changes to green as -- ding ding -- you are by YE WHIRLPOOLS
+mudmon-yay	With no resistance, the monsters stuff you in a mud stream. You become one of them. It's not so bad. Who knows, you might help the next adventurer to join in your zen. If you remember what an adventurer is by that time. All you need to do is live your life straightforwardly as time goes ahead and ahead. Surely running the mud monster gauntlet couldn't have been that easy...or could it?
+woulda-quick	Oh no! You saw the right way to go. This wasn't it
+tent-die	Unable to find an unblocked way, you stay and try to flail your sword as more tentacles appear, but it does no good. As they grab you, you remember being told you need to know when to flee. But then, you also remember being told it won't be anything obvious like a flashing door. This enrages you further as you realize the truth in your final moment
+sword-should	Unaccountably, you freeze when just lashing out with your sword would've done just fine. KONK! You pass out with a goofy smile on your face. That's...something. The lizard king drags you away
+

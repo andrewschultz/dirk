@@ -72,7 +72,6 @@ with open("story.ni") as file:
             if (a[0].lower() != last_room) and last_room:
                 print_and_dupe(this_room_string, last_room)
                 this_room_string = ""
-                if 'balls' in last_room: exit()
             last_room = a[0].lower()
             easy_moves = moves(a[5])
             hard_moves = moves(a[6])
