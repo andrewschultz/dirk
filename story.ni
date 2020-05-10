@@ -28,10 +28,13 @@ book undoing
 
 before undoing an action:
 	say "Time travel really shouldn't be A Thing on your [italic type]first[roman type] adventure, Dirk.[paragraph break]Plus allowing undos might destroy the burgeoning Laser Disc video game industry that will last for years otherwise in some far-off strange kingdom.";
+	if in-beta is true or debug-state is true:
+		say "But this is a [if debug-state is false]beta[else]debug[end if] version, so we'll let it slide.";
+		the rule succeeds;
 	the rule fails;
 
 check saving the game:
-	say "That's not very intrepid, Dirk![paragraph break]Apropos of nothing, you suddenly see a vision of a kid much weaker than yourself tying a string to a coin and dropping it into a slot in a big, tall booth of some sort. You don't know what he's doing, but it feels wrong!" instead;
+	say "That's not very intrepid, Dirk![paragraph break]Apropos of nothing, you suddenly see a vision of a kid much weaker than yourself tying a string to a coin and dropping it into a slot in a big, tall booth of some sort. The coin-on-a-string comes out a bit later. You don't know what he's doing, but it seems oh so wrong!" instead;
 
 book NounDomain
 
@@ -187,7 +190,7 @@ when play begins (this is the main start rule):
 	repeat through table of intro texts:
 		say "[my-text entry][paragraph break]";
 		if debug-state is false, wait for any key;
-	say "[line break]Before you leave, the wise man asks: 'In fact, you're so good, just say the word and you'll get a bit of extra challenge.' (type yes for hard mode)";
+	say "[line break]Before you leave, the wise man says: 'You are better than you think you are, Dirk. If you want additional challenges--just to score more points and show them--just say the word and you'll get a bit of extra challenge.' (type yes for hard mode)";
 	if debug-state is false:
 		if the player consents:
 			now hard-mode is true;
@@ -261,7 +264,6 @@ last-row is a number that varies.
 
 to dirkmove (a - a number):
 	now lastmove is a;
-	d "1.";
 	choose row row-in-moves in table of gamemoves;
 	now last-row is row-in-moves;
 	if a is 1:
@@ -274,11 +276,10 @@ to dirkmove (a - a number):
 	let X be right-easy entry;
 	if hard-mode is true and there is a right-hard entry:
 		now X is right-hard entry;
-	d "2.";
 	if is-mirrored is true:
 		if X is 4 or X is 8:
 			now X is X bit-xor 12;
-	d "Comparing [right-easy entry] [X] to [a]...[if is-mirrored is true]--but mirroring[end if], in row [row-in-moves].";
+	[d "Comparing [right-easy entry] [X] to [a]...[if is-mirrored is true]--but mirroring[end if], in row [row-in-moves].";]
 	if (X bit-and a) is a:
 		now moved-in-room is true;
 		say "[yay entry][line break]";
@@ -298,7 +299,7 @@ to dirkmove (a - a number):
 				bumpscore points entry;
 		if points entry is -1:
 			say "BUG implement this!";
-		d "Current row [row-in-moves].";
+[		d "Current row [row-in-moves].";]
 		if there is a finished entry and finished entry is last-in-room:
 			if location of player is dragon's lair:
 				say "The boys at the guild are surprised and jealous. They deconstruct your constant scrapes with death as nothing more than a simple multiple choice test and even try negging Daphne a bit, the bums, then mumble something about how you're lucky it's the middle ages and not the future, where you'd never make it as a Space Ace who can shoot laser guns, steer flying machines, and save the woman in distress.[paragraph break]You ask if women could shoot guns and steer machines in the future, too, after which you're shouted down as naive and impractical and contrary to the purposes of the adventurers['] guild.";
@@ -312,7 +313,7 @@ to dirkmove (a - a number):
 				pick-next-room;
 				prime-next-area;
 		otherwise:
-			d "Current row row-in-moves.";
+[			d "Current row [row-in-moves].";]
 			let need-to-skip be true;
 			while need-to-skip is true:
 				increment row-in-moves;
@@ -687,19 +688,19 @@ to mirror-check:
 
 book in-order
 
-Flaming Pit is a doubled room. "There're three ropes here swinging back and forth to the [r-l]. There's a ledge beyond them. The one you're on is currently retracting. You can't go back [l-r]."
+Flaming Pit is a room. it is doubled. "There're three ropes here swinging back and forth to the [r-l]. There's a ledge beyond them. The one you're on is currently retracting. You can't go back [l-r]."
 
 Closing Wall is a room. "A wall is rapidly closing in front of you. And the ones to the left and right don't look to be opening any time soon."
 
-There is a room called Horsing Around Walls and Fire. it is doubled. "Oh, look! A[one of][or]nother[stopping] horse with a gem on top! You forget your mission, distracted by the wrong sort of something shiny--treasure, not a passageway. [one of][or]Maybe this time... [stopping]When you climb on, the horse takes off at an alarming speed. Your horse swerves almost smack into a fireplace ahead and to the [l-r]."
+a room called Horsing Around Walls and Fire is a room. it is doubled. "Oh, look! A[one of][or]nother[stopping] horse with a gem on top! You forget your mission, distracted by the wrong sort of something shiny--treasure, not a passageway. [one of][or]Maybe this time... [stopping]When you climb on, the horse takes off at an alarming speed. Your horse swerves almost smack into a fireplace ahead and to the [l-r]."
 
 Drink Me is a room. "A small room. You walk towards an icky potion ahead of you with a big DRINK ME sign. This leaves you suspicious! If it were nutritious, there'd be a picture of someone even more muscular than you. Duh.[paragraph break]There's also a door to the right. What to do?"
 
-Crypt Creeps is a doubled room. "Just another hallway going forward. Exits are up ahead to the side, but...first, those bouncing skeleton heads that popped out. They're too many, and too low, to fight."
+Crypt Creeps is a room. it is doubled. "Just another hallway going forward. Exits are up ahead to the side, but...first, those bouncing skeleton heads that popped out. They're too many, and too low, to fight."
 
 Underground River is a room. "You walk obliviously to the edge of a narrow cliff and are suprised when it collapses ten feet from the edge. You fall into a purple river, and even more surprisingly, right into a barrel swept along by a current of purple water.[paragraph break]Before you can properly appreciate the luck involved, you float past a sign saying YE BOULDERS and suddenly see there's a small flashing cave to the LEFT--better go there, or you'll hit that rock wall ahead. Or to the sides."
 
-Plummeting Disc is a doubled room. "You jump through a doorway to a glowing wooden circle suspended in midair. It flashes and starts falling. You scream, but at least you keep your eyes open to see the ledge to the [l-r]!"
+Plummeting Disc is a room. it is doubled. "You jump through a doorway to a glowing wooden circle suspended in midair. It flashes and starts falling. You scream, but at least you keep your eyes open to see the ledge to the [l-r]!"
 
 Avalanche is a room. "You hear a rumbling above. The ground up and to the left begins falling into a void."
 
@@ -709,11 +710,11 @@ a room called Cage and Geyser is a room. "There's a cage all around you to the l
 
 Black Knight on Horse is a room. "As you observe the thorns to the right, a streak of lightning flashes[if hard-mode is true] toward you from behind and to the left. Better move[else] and sticks your sword in its sheath! Then a knight charges you from above[end if]!"
 
-Twirling Boulders is a doubled room. "You're on a narrow walkway. Two spinning boulders on sticks, in a circle, periodically block your passage up. There's no way down."
+Twirling Boulders is a room. it is doubled. "You're on a narrow walkway. Two spinning boulders on sticks, in a circle, periodically block your passage up. There's no way down."
 
 Lizard King is a room. "Oh no! A magnetic pot of gold schlurps your sword from your scabbard, ten feet away. Then it jangles off. Then there's a weird grunt from the right as a giant lizard in purple robes raises a golden scepter."
 
-Smithee is a doubled room. "You stick your sword in a magic fire, and immediately another glowing sword whistles and comes swooping down at you[one of]! Didn't you learn anything last time, Dirk?[or]![stopping] Oh, yeah, there's also fire on a couple sides of you."
+Smithee is a room. it is doubled. "You stick your sword in a magic fire, and immediately another glowing sword whistles and comes swooping down at you[one of]! Didn't you learn anything last time, Dirk?[or]![stopping] Oh, yeah, there's also fire on a couple sides of you."
 
 Wind Tunnel is a room. "Against your better judgement, you open a bulging door with a big WHOOSHING behind you. Fortunately, you don't have time to think of what anachronisms are swirling around, or you'd already be killed! As it is, you're distracted by a diamond or something in a window to a bottomless pit to the left. You think there may've been a door to the right, but you're not sure."
 
@@ -723,17 +724,17 @@ Snake Room is a room. "A snake pops down from the ceiling and hisses at you!"
 
 Goop Room is a room. "Goop bubbles from a cauldron and dries behind you and to each side. You suspect there'll be monsters to hack at soon, but not just yet. Process of elimination, Dirk, process of elimination."
 
-The room called Slide and Pit is a room. "Aaaaaa! There's a pit ahead of you, down! There's a wall to your left, but in a fit of lost ego (or clarity?) you imagine it's to the right, for people who matter."
+a room called Slide and Pit is a room. "Aaaaaa! There's a pit ahead of you, down! There's a wall to your left, but in a fit of lost ego (or clarity?) you imagine it's to the right, for people who matter."
 
 Giddy Goons is a room. "A tiny purple pig with a dagger comes bouncing impossibly out from the left! It's either very confident, or very backed up by friends who'll totally bumrush you if you're passive."
 
-The room called Fire and Lightning Room is a room. "Oh no! A bolt strikes from the ceiling and sets fire to the door ahead and, well, everywhere except your right. You briefly remember 'stop, drop and roll.'"
+a room called Fire and Lightning Room is a room. "Oh no! A bolt strikes from the ceiling and sets fire to the door ahead and, well, everywhere except your right. You briefly remember 'stop, drop and roll.'"
 
-Earthquake Room is a doubled room. "You notice your sword on your [l-r], and the ground on every other side also seems to be crumbling."
+Earthquake Room is a room. it is doubled. "You notice your sword on your [l-r], and the ground on every other side also seems to be crumbling."
 
 The room called Bats and Walkway is a room. "Another scene, another narrow walkway forward."
 
-Electric Knight is a doubled room. "A huge electric knight appears up ahead! He's way too far to attack. For now. You reflexively feel your sword on the [l-r] and notice the electric tiles glowing: up, down and [l-r]."
+Electric Knight is a room. it is doubled. "A huge electric knight appears up ahead! He's way too far to attack. For now. You reflexively feel your sword on the [l-r] and notice the electric tiles glowing: up, down and [l-r]."
 
 Bat King is a room. "You're dive-bombed by bats. Not enough to flee, but you should ward them off. Maybe by then enough walkways will vanish, "
 
@@ -743,7 +744,7 @@ Vanishing Checkerboard is a room. "Oh, man! You always hated checkers. You alway
 
 Mud Monsters is a room. "You're in a big mud land. What could live here? Mud monsters, that's what. They squelch toward you slowly and surround you. They don't seem to expect any resistance."
 
-pd2 is a doubled room. "You jump [one of][or]once again [stopping]through a door onto a disc suspended in midair. Congratulations, Dirk! Your weight broke the balance of magic that kept it there! It begins falling. But it's kind of fun, and your screams echo really neato, so you watch three ledges to the [l-r] go by, then three to the [r-l]. The ground below is coming up close, though! Only three more ledges to the [l-r]."
+pd2 is a room. it is doubled. "You jump [one of][or]once again [stopping]through a door onto a disc suspended in midair. Congratulations, Dirk! Your weight broke the balance of magic that kept it there! It begins falling. But it's kind of fun, and your screams echo really neato, so you watch three ledges to the [l-r] go by, then three to the [r-l]. The ground below is coming up close, though! Only three more ledges to the [l-r]."
 
 printed name of pd2 is "Plummeting Disc, Extra Stops"
 
@@ -815,7 +816,7 @@ to say splat-pur:
 	say "Splat! You failed to avoid a wall and sink into the purple depths."
 
 to say or-scen:
-	say "You could not steer to the safety of the garish orange strip! At least your last moments are filled with color."
+	say "You could not steer to the safety of the garish orange strip! At least your last moments are filled with color"
 
 to say whirl-d:
 	say "The whirlpool sucks you in! You have an acute view of green water before things go dark"
@@ -849,6 +850,27 @@ to say o-w-g:
 
 to say dirk-snk:
 	say "The door burns up as you go to touch it. You needed a sneakier way out, Dirk"
+
+to say ye-whirl:
+	say "Just as you worry the next part of the rapids will be a stripe leading into a cavern wall, the water changes to green as -- ding ding -- you are by YE WHIRLPOOLS"
+
+to say in-drag:
+	increment drag-kill;
+
+to say mudmon-yay:
+	say "With no resistance, the monsters stuff you in a mud stream. You become one of them. It's not so bad. Who knows, you might help the next adventurer to join in your zen. If you remember what an adventurer is by that time. All you need to do is live your life straightforwardly as time goes ahead and ahead. Surely running the mud monster gauntlet couldn't have been that easy...or could it?"
+
+to say woulda-quick:
+	say "Oh no! You saw the right way to go. This wasn't it"
+
+to say tent-die:
+	say "Unable to find an unblocked way, you stay and try to flail your sword as more tentacles appear, but it does no good. As they grab you, you remember being told you need to know when to flee. But then, you also remember being told it won't be anything obvious like a flashing door. This enrages you further as you realize the truth in your final moment"
+
+to say konk:
+	say "KONK! You pass out with a goofy smile on your face. That's...something. The lizard king drags you away"
+
+to say sword-should:
+	say "Unaccountably, you freeze when just lashing out with your sword would've done just fine. [konk]"
 
 [wait-check works as follows. It is skipped if wait-check & 2 *and* you did not wait. If you wait and wait-check & 1, you'll be safe.]
 [finished works as follows: 1 = always, 2 = only in easy]
@@ -1017,27 +1039,6 @@ Dragon's Lair	false	false	0	0	40	--	4750	--	"[if hard-mode is true]You step back
 Dragon's Lair	false	true	0	0	2	--	4750	--	"The sword deflects the dragon's flame-blast! Quick, Dirk, while it's recharging!"	"Your fear makes you delay. You are stuck. And burnt up. So close, Dirk!"
 Dragon's Lair	false	false	1	0	2	--	5000	--	"You throw the sword. Right in the neck! Singe collapses. You take the key from his neck and unlock Daphne. Mushiness ensues. Way to go, Dirk![paragraph break]Now how do you get out of here?[wfak]While you're thinking, the castle itself begins to crumble. Your adventures caused so much structural damage, the Dragon crashing to its death started off an earthquake. With debris dropping everywhere, you and Daphne can only run towards each flashing door you see. But you're all over that by now, man![wfak]"	"Oh no, Dirk! You fall at the final hurdle[if drag-kill > 1 and lives-left > 1]. Or maybe you know exactly what you're doing--as greedy for maximum points as Singe was for treasure. Daphne sobs as she looks on, uncomprehending. Are those extra points really worth it?[else if lives-left > 1]. Or maybe you're trying for a few last points, like this guy: https://stevenf.com/2014/05/21/arcade-story/?[else if lives-left is 0], and you don't have any chances left. Pathos![end if][in-drag]"
 [togm-end]
-
-to say ye-whirl:
-	say "Just as you worry the next part of the rapids will be a stripe leading into a cavern wall, the water changes to green as -- ding ding -- you are by YE WHIRLPOOLS"
-
-to say in-drag:
-	increment drag-kill;
-
-to say mudmon-yay:
-	say "With no resistance, the monsters stuff you in a mud stream. You become one of them. It's not so bad. Who knows, you might help the next adventurer to join in your zen. If you remember what an adventurer is by that time. All you need to do is live your life straightforwardly as time goes ahead and ahead. Surely running the mud monster gauntlet couldn't have been that easy...or could it?"
-
-to say woulda-quick:
-	say "Oh no! You saw the right way to go. This wasn't it"
-
-to say tent-die:
-	say "Unable to find an unblocked way, you stay and try to flail your sword as more tentacles appear, but it does no good. As they grab you, you remember being told you need to know when to flee. But then, you also remember being told it won't be anything obvious like a flashing door. This enrages you further as you realize the truth in your final moment"
-
-to say konk:
-	say "KONK! You pass out with a goofy smile on your face. That's...something. The lizard king drags you away"
-
-to say sword-should:
-	say "Unaccountably, you freeze when just lashing out with your sword would've done. [konk]"
 
 chapter dircheating
 
